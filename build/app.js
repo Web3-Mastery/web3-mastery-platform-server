@@ -11,7 +11,13 @@ dotenv.config();
 // app.use(cors());
 app.use(cors({
     credentials: true,
-    origin: ['https://web3mastery.org', 'https://stage.web3mastery.org', 'https://web3mastery.vercel.app', 'http://localhost:3000'],
+    origin: [
+        'https://web3mastery.org',
+        'https://www.web3mastery.org',
+        'https://stage.web3mastery.org',
+        'https://web3mastery.vercel.app',
+        'http://localhost:3000'
+    ],
     methods: 'GET, POST, PUT, PATCH, DELETE, OPTIONS'
 }));
 app.use(cookieParser());
