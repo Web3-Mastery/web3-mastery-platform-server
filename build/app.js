@@ -1,0 +1,57 @@
+// dependency imports
+import express from 'express';
+import dotenv from 'dotenv';
+import cors from 'cors';
+import cookieParser from 'cookie-parser';
+import log from './utils/logger.js';
+import newsletterSubscriberRouter from './domains/newsletter/routes/newsletter.router.js';
+// dependency inits
+const app = express();
+dotenv.config();
+// app.use(cors());
+app.use(cors({
+    credentials: true,
+    origin: ['https://web3mastery.org', 'https://stage.web3mastery.org', 'https://web3mastery.vercel.app', 'http://localhost:3000'],
+    methods: 'GET, POST, PUT, PATCH, DELETE, OPTIONS'
+}));
+app.use(cookieParser());
+app.use(express.json());
+app.use(express.urlencoded({ extended: true }));
+// configure .env
+if (process.env.NODE_ENV === 'development') {
+    dotenv.config({ path: '.env.development' });
+}
+if (process.env.NODE_ENV === 'staging') {
+    dotenv.config({ path: '.env.stage' });
+}
+if (process.env.NODE_ENV === 'production') {
+    dotenv.config({ path: '.env.production' });
+}
+// utils import
+import dbConnector from './db/connect-db.js';
+// @ts-ignore
+app.get('/', (req, res) => {
+    res.status(200).send('API Is Live - welcome to the Web3 Mastery API server');
+});
+// user end-points - all routed
+app.use('/api/v1/newsletter-subscription', newsletterSubscriberRouter);
+const port = process.env.PORT || 5000;
+const start = async () => {
+    const decodeDB_URI = process.env.DB_URI;
+    try {
+        log.info(`Establishing database connection...`);
+        const dbConnection = await dbConnector(decodeDB_URI);
+        dbConnection &&
+            log.info(`...................................\nConnected to: ${dbConnection?.connection.host} 
+        \nDatabase connected successfully \n........................................................`);
+        // console.log(process.env.JWT_SECRET);
+        app.listen(port, () => log.info(`Server is listening on port ${port}.`));
+    }
+    catch (error) {
+        if (error instanceof Error) {
+            log.error(error.message);
+        }
+    }
+};
+// serve
+start();
