@@ -4,7 +4,7 @@ import dotenv from 'dotenv';
 import cors from 'cors';
 import cookieParser from 'cookie-parser';
 import log from './utils/logger.js';
-import newsletterSubscriberRouter from './domains/newsletter/routes/newsletter.router.js';
+import newsletterRouter from './domains/newsletter/routes/newsletter.router.js';
 // dependency inits
 const app = express();
 dotenv.config();
@@ -40,7 +40,7 @@ app.get('/', (req, res) => {
     res.status(200).send('API Is Live - welcome to the Web3 Mastery API server');
 });
 // user end-points - all routed
-app.use('/api/v1/newsletter-subscription', newsletterSubscriberRouter);
+app.use('/api/v1/newsletter-subscription', newsletterRouter);
 const port = process.env.PORT || 5000;
 const start = async () => {
     const decodeDB_URI = process.env.DB_URI;
