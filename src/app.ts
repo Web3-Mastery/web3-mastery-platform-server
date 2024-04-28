@@ -5,7 +5,7 @@ import dotenv from 'dotenv';
 import cors from 'cors';
 import cookieParser from 'cookie-parser';
 import log from './utils/logger.js';
-import newsletterSubscriberRouter from './domains/newsletter/routes/newsletter.router.js';
+import newsletterRouter from './domains/newsletter/routes/newsletter.router.js';
 
 // import all types here
 import type { Request, Response } from 'express';
@@ -56,7 +56,7 @@ app.get('/', (req: Request, res: Response) => {
 });
 
 // user end-points - all routed
-app.use('/api/v1/newsletter-subscription', newsletterSubscriberRouter);
+app.use('/api/v1/newsletter-subscription', newsletterRouter);
 
 const port = process.env.PORT || 5000;
 
