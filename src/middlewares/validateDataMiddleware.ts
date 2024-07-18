@@ -31,14 +31,13 @@ export const validateData = (dataSchema: validatorSpecs) => {
         console.log(error);
 
         return res.status(400).json({
-          error: 'ZodError: user input error',
-          responseMessage: `request unsuccessful: please provide all required inputs including all the needed 
-            request params and/ or queries - all queries and params must also match relevant specification`
+          error: 'ZodError(input validation error)',
+          responseMessage: error
         });
       } else {
         return res.status(500).json({
           responseMessage: 'user input error',
-          error: error as string
+          error: error
         });
       }
     }

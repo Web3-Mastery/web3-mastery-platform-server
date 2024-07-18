@@ -7,8 +7,10 @@ declare module 'express' {
       userId: string;
       userEmail: string;
       sessionStatus: string;
-      renewedUserAccessToken: string;
-      renewedUserRefreshToken: string;
+      // renewedUserAccessToken?: string;
+      // renewedUserRefreshToken?: string;
+      newUserAccessToken?: string;
+      newUserRefreshToken?: string;
     };
   }
 }

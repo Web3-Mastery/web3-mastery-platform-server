@@ -1,7 +1,7 @@
 import mongoose from 'mongoose';
-import type { NewsletterSubscriberSpec } from '../schemas/newsletter-subscriber.zod.js';
+import type { NewsletterSubscriberSpecs } from '../schemas/newsletter-subscriber.zod.js';
 
-const newsletterSubscriberSchema = new mongoose.Schema<NewsletterSubscriberSpec>(
+const newsletterSubscriberSchema = new mongoose.Schema<NewsletterSubscriberSpecs>(
   {
     email: {
       type: String,

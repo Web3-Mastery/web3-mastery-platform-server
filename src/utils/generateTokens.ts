@@ -9,6 +9,9 @@ async function generateTokens(data: { preSignUpToken?: string; user?: UserSpecs;
   const jwtSecret = process.env.JWT_SECRET as string;
 
   if (tokenType == 'oneTimePasswordToken' && user) {
+    if (!user?._id || !user?.email) {
+      throw new Error('jwt token generation error: the provided user does not contain an id or email, please provide both');
+    }
     // OTP lifetime = 180000ms = 3 minutes
     const oneTimePasswordToken = jwt.sign({ userId: user._id, userEmail: user.email }, jwtSecret, { expiresIn: process.env.JWT_OTP_LIFETIME });
 
@@ -26,6 +29,10 @@ async function generateTokens(data: { preSignUpToken?: string; user?: UserSpecs;
   }
 
   if (user) {
+    if (!user?._id || !user?.email) {
+      throw new Error('jwt token generation error: the provided user does not contain an id or email, please provide both');
+    }
+
     const accessToken = jwt.sign({ userId: user._id, userEmail: user.email }, jwtSecret, { expiresIn: process.env.JWT_LIFETIME });
 
     const salt = await bcrypt.genSalt(14);
