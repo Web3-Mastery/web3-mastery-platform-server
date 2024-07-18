@@ -6,6 +6,8 @@ import cors from 'cors';
 import cookieParser from 'cookie-parser';
 import log from './utils/logger.js';
 import newsletterRouter from './domains/newsletter/routes/newsletter.router.js';
+import authRouter from './domains/user/routes/auth.router.js';
+import userRouter from './domains/user/routes/user.router.js';
 
 // import all types here
 import type { Request, Response } from 'express';
@@ -52,11 +54,18 @@ import dbConnector from './db/connect-db.js';
 
 // @ts-ignore
 app.get('/', (req: Request, res: Response) => {
-  res.status(200).send('API Is Live - welcome to the Web3 Mastery API server');
+  res.status(200).send({
+    responseMessage: 'Welcome to the Web3 Mastery API server',
+    response: {
+      apiStatus: 'OK'
+    }
+  });
 });
 
 // user end-points - all routed
 app.use('/api/v1/newsletter-subscription', newsletterRouter);
+app.use('/api/v1/user', userRouter);
+app.use('/api/v1/auth', authRouter);
 
 const port = process.env.PORT || 5000;
 

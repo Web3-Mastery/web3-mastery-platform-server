@@ -1,5 +1,5 @@
 import type { Request, Response } from 'express';
-import type { NewsletterSubscriberSpec } from '../schemas/newsletter-subscriber.zod.js';
+import type { NewsletterSubscriberSpecs } from '../schemas/newsletter-subscriber.zod.js';
 import { createNewsletterSubscription } from '../lib/newsletter.createSubscription.service.js';
 import nodemailer from 'nodemailer';
 
@@ -16,7 +16,7 @@ type ResponseSpecs = {
   error?: string;
   responseMessage: string;
   response?: {
-    subscriber: NewsletterSubscriberSpec;
+    subscriber: NewsletterSubscriberSpecs;
   };
 };
 
@@ -31,7 +31,7 @@ const createSubscription = async (req: Request<{}, ResponseSpecs, inSpecs>, res:
       });
     }
 
-    const newSubscriber: NewsletterSubscriberSpec = await createNewsletterSubscription(email);
+    const newSubscriber: NewsletterSubscriberSpecs = await createNewsletterSubscription(email);
 
     if (newSubscriber) {
       const subscribedEmail = newSubscriber.email;
