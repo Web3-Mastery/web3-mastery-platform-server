@@ -1,6 +1,7 @@
 import { z } from 'zod';
 import { jobSchema } from '../../jobs/schemas/jobSchema.zod.js';
 import { postSchema } from '../../posts/schemas/postSchema.zod.js';
+import { sessionActivitySchema } from '../../platform/schemas/sessionActivity.schema.js';
 export const userSchema = z.object({
     name: z
         .string({
@@ -174,12 +175,7 @@ export const userSchema = z.object({
             invalid_type_error: 'userDevice data must be an array'
         })
             .optional(),
-        subSessionActivity: z
-            .string({
-            // required_error: 'subSessionActivity must be stated',
-            invalid_type_error: 'subSessionActivity must be a string'
-        })
-            .optional(),
+        subSessionActivity: sessionActivitySchema.optional(),
         checkInTime: z
             .string({
             // required_error: 'checkInTime is required',

@@ -3,8 +3,27 @@ import { findUser } from '../lib/user.findUser.service.js';
 import decryptHandler from '../../../utils/decryptHandler.js';
 import generateTokens from '../../../utils/generateTokens.js';
 import { findAndUpdateUser } from '../lib/user.findAndUpdateUser.service.js';
+// type RequestHeaderContentSpecs = {
+//   authorization: string;
+//   email: string;
+//   sub_session_activity_id: string;
+// };
 const loginUser = async (req, res) => {
     try {
+        if (!req.user) {
+            return res.status(401).json({
+                error: 'request rejected',
+                responseMessage: `access to request headers impossible: please provide access to request headers`
+            });
+        }
+        const { subSessionActivityId: sub_session_activity_id } = req.user;
+        // console.log(sub_session_activity_id);
+        if (!sub_session_activity_id) {
+            return res.status(401).json({
+                error: 'access forbidden',
+                responseMessage: `request header data missing or is not provided: 'email' and 'sub_session_activity_id' must be provided as request header data`
+            });
+        }
         const { email, password } = req.body;
         if (!email || !password) {
             return res.status(400).json({
@@ -42,49 +61,28 @@ const loginUser = async (req, res) => {
             // send new accessToken well just in case the previous one has expired
             const { refreshToken, accessToken } = generatedTokens;
             // console.log(accessToken);
-            if (user.sessions && user.sessions.length > 0) {
-                // console.log(user.sessions);
-                const currentSession = user.sessions[user.sessions.length - 1];
-                if (currentSession) {
-                    const currentSubSession = currentSession[currentSession.length - 1];
-                    const currentSessionId = currentSubSession?.sessionId;
-                    const newSessionId = Number(currentSessionId) + 1;
-                    const currentTimeInMilliseconds = Date.now();
-                    const newCurrentSubSessionObject = {
-                        checkInTime: currentTimeInMilliseconds.toString(),
-                        subSessionActivity: 'user log-in',
-                        sessionId: newSessionId.toString() // same id since they are on the same session
-                    };
-                    user.sessions?.push([newCurrentSubSessionObject]);
-                    const updatedUser = await findAndUpdateUser({
-                        email: user.email,
-                        requestBody: {
-                            sessions: user.sessions,
-                            accessToken: accessToken
-                        }
-                    });
-                    if (updatedUser) {
-                        // set refresh token as cookie for authorization purposes
-                        res.cookie('Web3Mastery_SecretRefreshToken', refreshToken, {
-                            // domain: 'localhost:3000',
-                            // path: '/',
-                            httpOnly: true,
-                            secure: true, // prevents "man-in-the-middle" attacks
-                            sameSite: 'strict', // Prevent CSRF attacks
-                            maxAge: 24 * 60 * 60 * 1000 // 1 day
-                        });
-                        //   const { accessToken } = generatedTokens as { accessToken: string };
-                        // console.log(`user is ${user}`);
-                        return res.status(200).json({
-                            responseMessage: 'user logged in successfully',
-                            response: {
-                                user: updatedUser
-                            }
-                        });
+            const updatedUser = await findAndUpdateUser({ email: email, requestBody: { accessToken } });
+            // const subSessionActivity = (await findSessionActivity({ activityId: sub_session_activity_id })) as SessionActivitySpecs;
+            if (updatedUser) {
+                res.cookie('Web3Mastery_SecretRefreshToken', refreshToken, {
+                    // domain: 'localhost:3000',
+                    // path: '/',
+                    httpOnly: true,
+                    secure: true, // prevents "man-in-the-middle" attacks
+                    sameSite: 'strict', // Prevent CSRF attacks
+                    maxAge: 24 * 60 * 60 * 1000 // 1 day
+                });
+                //   const { accessToken } = generatedTokens as { accessToken: string };
+                // console.log(`user is ${user}`);
+                return res.status(200).json({
+                    responseMessage: 'user logged in successfully',
+                    response: {
+                        user: updatedUser
                     }
-                }
+                });
             }
         }
+        return;
     }
     catch (error) {
         if (error instanceof Error) {

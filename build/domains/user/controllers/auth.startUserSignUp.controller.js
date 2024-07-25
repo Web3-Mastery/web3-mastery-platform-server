@@ -5,9 +5,28 @@ import { findPreSignUpUser } from '../lib/user.findPreSignUpUser.service.js';
 import { createPreSignUpUser } from '../lib/auth.createPreSignUpUser.service.js';
 import { findAndUpdatePreSignUpUser } from '../lib/user.findAndUpdatePreSignUpUser.service.js';
 import { deletePreSignUpUser } from '../lib/user.deletePreSignUpUser.service.js';
+import { findSessionActivity } from '../../platform/lib/platform.findSessionActivity.service.js';
+// type RequestHeaderContentSpecs = {
+//   authorization: string;
+//   email: string;
+//   sub_session_activity_id: string;
+// };
 const startUserSignUp = async (req, res) => {
-    const { name, email } = req.body;
     try {
+        if (!req.user) {
+            return res.status(401).json({
+                error: 'request rejected',
+                responseMessage: `access to request headers impossible: please provide access to request headers`
+            });
+        }
+        const { subSessionActivityId: sub_session_activity_id } = req.user;
+        if (!sub_session_activity_id) {
+            return res.status(401).json({
+                error: 'access forbidden',
+                responseMessage: `request header data missing or is not provided: 'email' and 'sub_session_activity_id' must be provided as request header data`
+            });
+        }
+        const { name, email } = req.body;
         // if (req.user) {
         if (!email || !name) {
             return res.status(400).json({
@@ -56,12 +75,14 @@ const startUserSignUp = async (req, res) => {
         }
         // generate signup link
         const signUpToken = await generateTokens({ tokenType: 'preSignUpToken', user: { name, email } });
+        const subSessionActivity = (await findSessionActivity({ activityId: sub_session_activity_id }));
+        // console.log(subSessionActivity);
         const newPreSignUpUser = await createPreSignUpUser({
             user: {
                 name,
                 email,
                 secretSignUpToken: signUpToken,
-                sessions: [[{ checkInTime: '0', subSessionActivity: 'sign-up initialization', sessionId: '1' }]]
+                sessions: [[{ checkInTime: '0', subSessionActivity: subSessionActivity, sessionId: '1' }]]
             }
         });
         // generate tokens, pass access token, and set refresh token
@@ -96,16 +117,16 @@ const startUserSignUp = async (req, res) => {
             });
             const userFirstName = name.split(' ')[0];
             const mailOptions = {
-                from: process.env.ADMIN_CONTROLLER_EMAIL,
+                from: `"Web3 Mastery" ${process.env.ADMIN_CONTROLLER_EMAIL}`,
                 to: email,
                 subject: 'Complete Web3 Mastery SignUp',
                 html: `<p>GM ${userFirstName?.charAt(0).toUpperCase() + userFirstName?.slice(1)}, <br/><br/> Great to have you join Web3 Mastery. <br/><br/>
-              Use the secret link below to complete your sign-up <br/><br/>
-              ${secretSignUpLink}
-              <br/><br/>
-              Best regards, <br/><br/>
-              <strong>- The Web3 Mastery Team.</strong><br/><br/>
-              `
+                Use the secret link below to complete your sign-up <br/><br/>
+                ${secretSignUpLink}
+                <br/><br/>
+                Best regards, <br/><br/>
+                <strong>- The Web3 Mastery Team.</strong><br/><br/>
+                `
             };
             transporter.sendMail(mailOptions, (err) => {
                 if (err) {
@@ -139,7 +160,7 @@ const startUserSignUp = async (req, res) => {
             });
         }
     }
-    // }
     return;
 };
+// }
 export default startUserSignUp;

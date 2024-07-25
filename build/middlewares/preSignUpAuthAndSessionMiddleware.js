@@ -5,15 +5,24 @@ import generateTokens from '../utils/generateTokens.js';
 // import { findAndUpdateUser } from '../domains/user/lib/user.findAndUpdateUser.service.js';
 import { findPreSignUpUser } from '../domains/user/lib/user.findPreSignUpUser.service.js';
 import { findAndUpdatePreSignUpUser } from '../domains/user/lib/user.findAndUpdatePreSignUpUser.service.js';
+// import generateTokens from '../utils/generateTokens.js';
+import { findSessionActivity } from '../domains/platform/lib/platform.findSessionActivity.service.js';
 const authAndSessionsMiddleware = async (req, res, next) => {
     const requestHeaders = req.headers;
     console.log(requestHeaders);
-    const { email, authorization, sub_session_activity } = requestHeaders;
+    const { email, authorization, sub_session_activity_id } = requestHeaders;
     const jwtSecret = process.env.JWT_SECRET;
     // console.log(email);
     // console.log(authorization);
     try {
         // console.log('authAndSessionMiddleware started');
+        if (!email || !authorization || !sub_session_activity_id) {
+            return res.status(401).json({
+                error: 'access forbidden',
+                responseMessage: `request header data missing or is not provided: 'email', 'authorization', 
+        and 'sub_session_activity_id' must be provided as request header data`
+            });
+        }
         if (!req.headers.cookie || !req.headers.cookie.includes('Web3Mastery_SecretRefreshToken')) {
             return res.status(401).json({
                 error: 'access forbidden',
@@ -36,6 +45,7 @@ const authAndSessionsMiddleware = async (req, res, next) => {
                 responseMessage: 'authorization string does not match expected(Bearer Token) result'
             });
         }
+        const currentSubSessionActivity = (await findSessionActivity({ activityId: sub_session_activity_id }));
         const returnedToken = authorization.split(' ')[1];
         // console.log(returnedToken);
         if (returnedToken && preSignUpUser) {
@@ -70,7 +80,7 @@ const authAndSessionsMiddleware = async (req, res, next) => {
                     const currentTimeInMilliseconds = Date.now();
                     const newCurrentSubSessionObject = {
                         checkInTime: currentTimeInMilliseconds.toString(),
-                        subSessionActivity: sub_session_activity,
+                        subSessionActivity: currentSubSessionActivity,
                         sessionId: currentSessionId // same id since they are on the same session
                     };
                     currentSession?.push(newCurrentSubSessionObject);
@@ -90,7 +100,8 @@ const authAndSessionsMiddleware = async (req, res, next) => {
                 userEmail: decodedJWT.userEmail,
                 sessionStatus,
                 newUserAccessToken: accessToken,
-                newUserRefreshToken: refreshToken
+                newUserRefreshToken: refreshToken,
+                subSessionActivityId: sub_session_activity_id
             };
         }
         // console.log(req.user);
@@ -101,6 +112,7 @@ const authAndSessionsMiddleware = async (req, res, next) => {
         if (error instanceof Error && error.message === 'jwt expired') {
             /* Access token is expired. Verify token(ignoring expiry) to make sure it's the user,
             then regenerate new tokens(access and refresh) and pass from middleware */
+            const currentSubSessionActivity = (await findSessionActivity({ activityId: sub_session_activity_id }));
             const preSignUpUser = (await findPreSignUpUser({ email }));
             // console.log(`catch block ${user}`);
             /* Needed to get user, and perform a DB check afresh so that TS won't complain that user might be undefined, but
@@ -130,10 +142,10 @@ const authAndSessionsMiddleware = async (req, res, next) => {
                     const newSessionId = Number(currentSessionId) + 1;
                     // console.log(newSessionId);
                     const currentTimeInMilliseconds = Date.now();
-                    console.log(sub_session_activity);
+                    // console.log(sub_session_activity);
                     const newCurrentSubSessionObject = {
                         checkInTime: currentTimeInMilliseconds.toString(),
-                        subSessionActivity: sub_session_activity,
+                        subSessionActivity: currentSubSessionActivity,
                         sessionId: newSessionId.toString() // same id since they are on the same session
                     };
                     preSignUpUser.sessions?.push([newCurrentSubSessionObject]);
@@ -153,10 +165,19 @@ const authAndSessionsMiddleware = async (req, res, next) => {
                 userEmail: preSignUpUser.email,
                 sessionStatus,
                 newUserAccessToken: accessToken,
-                newUserRefreshToken: refreshToken
+                newUserRefreshToken: refreshToken,
+                subSessionActivityId: sub_session_activity_id
             };
             // console.log(req.user);
             next();
+        }
+        if (error instanceof Error) {
+            console.log(error.message);
+            // throw new Error(error.message);
+            return res.status(500).json({
+                responseMessage: 'request unsuccessful, please try again',
+                error: error.message
+            });
         }
         else {
             return res.status(500).json({

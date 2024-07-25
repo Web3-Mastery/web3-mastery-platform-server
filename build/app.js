@@ -7,6 +7,7 @@ import log from './utils/logger.js';
 import newsletterRouter from './domains/newsletter/routes/newsletter.router.js';
 import authRouter from './domains/user/routes/auth.router.js';
 import userRouter from './domains/user/routes/user.router.js';
+import platformRouter from './domains/platform/routes/platform.router.js';
 // dependency inits
 const app = express();
 dotenv.config();
@@ -50,6 +51,7 @@ app.get('/', (req, res) => {
 app.use('/api/v1/newsletter-subscription', newsletterRouter);
 app.use('/api/v1/user', userRouter);
 app.use('/api/v1/auth', authRouter);
+app.use('/api/v1/platform', platformRouter);
 const port = process.env.PORT || 5000;
 const start = async () => {
     const decodeDB_URI = process.env.DB_URI;

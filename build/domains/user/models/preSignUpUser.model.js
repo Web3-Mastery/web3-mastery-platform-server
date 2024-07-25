@@ -41,8 +41,25 @@ const preSignUpUserSchema = new mongoose.Schema({
                     }
                 ],
                 subSessionActivity: {
-                    type: String
-                    // required: [true, 'subSessionActivity must be stated']
+                    activityName: {
+                        type: String,
+                        required: true
+                    },
+                    activityDescription: {
+                        type: String,
+                        required: true
+                    },
+                    activityId: {
+                        type: String,
+                        required: true
+                    }
+                    //   validate: {
+                    //     validator: (value: any) => {
+                    //       return value.every((item: SessionActivitySpecs) => sessionActivitySchema.safeParse(item).success);
+                    //     },
+                    //     message: 'subSessionActivity must be an object containing relevant details about the current sub-session activity'
+                    //   }
+                    //   // required: [true, 'subSessionActivity must be stated']
                 },
                 checkInTime: {
                     type: String,

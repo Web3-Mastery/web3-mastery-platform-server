@@ -13,7 +13,7 @@ const getUserProfileData = async (req, res) => {
             if (req.user.userId !== userId) {
                 return res.status(403).json({
                     error: 'user error',
-                    responseMessage: `user/email provided in request header is not authorized to fetch data for user with id: ${userId}`
+                    responseMessage: `user/email provided in request header is not authorized to fetch data for user with id: '${userId}'`
                 });
             }
             const { newUserRefreshToken, sessionStatus } = req?.user;
