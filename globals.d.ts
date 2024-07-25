@@ -4,13 +4,14 @@ import { Request } from 'express';
 declare module 'express' {
   interface Request {
     user?: {
-      userId: string;
-      userEmail: string;
-      sessionStatus: string;
+      userId?: string;
+      userEmail?: string;
+      sessionStatus?: string;
       // renewedUserAccessToken?: string;
       // renewedUserRefreshToken?: string;
       newUserAccessToken?: string;
       newUserRefreshToken?: string;
+      subSessionActivityId?: string;
     };
   }
 }
