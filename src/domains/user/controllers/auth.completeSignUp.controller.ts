@@ -166,7 +166,7 @@ const completeSignUp = async (req: Request<{}, ResponseSpecs, UserSpecs>, res: R
             }
           });
 
-          if (preSignUpUser && newFullySignedUpUser) {
+          if (preSignUpUser && newFullySignedUpUser && sessionStatus) {
             // find the newly created user, and add it's token to it
             const fullySignedUpUser_WithOutAccessToken = await findUser({ email: newFullySignedUpUser.email });
             // console.log(fullySignedUpUser_WithOutAccessToken);

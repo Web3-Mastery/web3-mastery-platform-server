@@ -7,6 +7,7 @@ import preSignUpAuthAndSessionMiddleware from '../../../middlewares/preSignUpAut
 import completeSignUp from '../controllers/auth.completeSignUp.controller.js';
 import { z } from 'zod';
 import loginUser from '../controllers/auth.login.controller.js';
+import openAccessSessionsMiddleware from '../../../middlewares/openAccessSessionsMiddleware.js';
 
 // express router init
 const router = express.Router();
@@ -21,11 +22,11 @@ const preSignUpSchema = z.object({
     .optional()
 });
 
-router.route('/start-sign-up').post(validateData({ body: userSchema }), startUserSignUp);
+router.route('/start-sign-up').post(validateData({ body: userSchema }), openAccessSessionsMiddleware, startUserSignUp);
 router
   .route('/verify-sign-up-initialization')
   .post(validateData({ body: preSignUpSchema }), preSignUpAuthAndSessionMiddleware, verifySignUpInitialization);
 router.route('/complete-sign-up').post(validateData({ body: userSchema }), preSignUpAuthAndSessionMiddleware, completeSignUp);
-router.route('/log-in').post(validateData({ body: userSchema }), loginUser);
+router.route('/log-in').post(validateData({ body: userSchema }), openAccessSessionsMiddleware, loginUser);
 
 export default router;

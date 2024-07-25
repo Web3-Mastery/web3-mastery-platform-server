@@ -1,7 +1,7 @@
 // import mongoose, { Schema, Document } from 'mongoose';
 import mongoose from 'mongoose';
 import type { UserSpecs } from '../schemas/userSchema.zod.js';
-
+// import { sessionActivitySchema, type SessionActivitySpecs } from '../../platform/schemas/sessionActivity.schema.js';
 // interface UserDocument extends Document, UserSpec {}
 
 interface _UserSpecs extends UserSpecs {
@@ -51,8 +51,26 @@ const preSignUpUserSchema = new mongoose.Schema<_UserSpecs>(
             }
           ],
           subSessionActivity: {
-            type: String
-            // required: [true, 'subSessionActivity must be stated']
+            activityName: {
+              type: String,
+              required: true
+            },
+            activityDescription: {
+              type: String,
+              required: true
+            },
+            activityId: {
+              type: String,
+              required: true
+            }
+
+            //   validate: {
+            //     validator: (value: any) => {
+            //       return value.every((item: SessionActivitySpecs) => sessionActivitySchema.safeParse(item).success);
+            //     },
+            //     message: 'subSessionActivity must be an object containing relevant details about the current sub-session activity'
+            //   }
+            //   // required: [true, 'subSessionActivity must be stated']
           },
           checkInTime: {
             type: String,

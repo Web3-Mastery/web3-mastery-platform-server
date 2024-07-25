@@ -3,6 +3,7 @@ import mongoose from 'mongoose';
 import type { UserSpecs } from '../schemas/userSchema.zod.js';
 import { postSchema } from '../../posts/schemas/postSchema.zod.js';
 import { jobSchema } from '../../jobs/schemas/jobSchema.zod.js';
+// import { sessionActivitySchema } from '../../platform/schemas/sessionActivity.schema.js';
 
 // interface UserDocument extends Document, UserSpecs {}
 
@@ -188,9 +189,26 @@ const userSchema = new mongoose.Schema<UserSpecs>(
             }
           ],
           subSessionActivity: {
-            type: String,
-            trim: true
-            // required: [true, 'subSessionActivity must be stated']
+            activityName: {
+              type: String,
+              required: true
+            },
+            activityDescription: {
+              type: String,
+              required: true
+            },
+            activityId: {
+              type: String,
+              required: true
+            }
+
+            //   validate: {
+            //     validator: (value: any) => {
+            //       return value.every((item: SessionActivitySpecs) => sessionActivitySchema.safeParse(item).success);
+            //     },
+            //     message: 'subSessionActivity must be an object containing relevant details about the current sub-session activity'
+            //   }
+            //   // required: [true, 'subSessionActivity must be stated']
           },
           checkInTime: {
             type: String,

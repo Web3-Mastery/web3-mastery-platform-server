@@ -33,7 +33,7 @@ const getUserProfileData = async (req: Request<{ userId: string }, ResponseSpecs
       if (req.user.userId !== userId) {
         return res.status(403).json({
           error: 'user error',
-          responseMessage: `user/email provided in request header is not authorized to fetch data for user with id: ${userId}`
+          responseMessage: `user/email provided in request header is not authorized to fetch data for user with id: '${userId}'`
         });
       }
 

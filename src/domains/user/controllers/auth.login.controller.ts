@@ -24,8 +24,31 @@ type ResponseSpecs = {
   };
 };
 
+// type RequestHeaderContentSpecs = {
+//   authorization: string;
+//   email: string;
+//   sub_session_activity_id: string;
+// };
+
 const loginUser = async (req: Request<{}, ResponseSpecs, InSpecs>, res: Response<ResponseSpecs>) => {
   try {
+    if (!req.user) {
+      return res.status(401).json({
+        error: 'request rejected',
+        responseMessage: `access to request headers impossible: please provide access to request headers`
+      });
+    }
+
+    const { subSessionActivityId: sub_session_activity_id } = req.user;
+    // console.log(sub_session_activity_id);
+
+    if (!sub_session_activity_id) {
+      return res.status(401).json({
+        error: 'access forbidden',
+        responseMessage: `request header data missing or is not provided: 'email' and 'sub_session_activity_id' must be provided as request header data`
+      });
+    }
+
     const { email, password } = req.body;
 
     if (!email || !password) {
@@ -74,60 +97,33 @@ const loginUser = async (req: Request<{}, ResponseSpecs, InSpecs>, res: Response
       const { refreshToken, accessToken } = generatedTokens as { refreshToken: string; accessToken: string };
       // console.log(accessToken);
 
-      if (user.sessions && user.sessions.length > 0) {
-        // console.log(user.sessions);
-        const currentSession = user.sessions[user.sessions.length - 1];
+      const updatedUser = await findAndUpdateUser({ email: email, requestBody: { accessToken } });
+      // const subSessionActivity = (await findSessionActivity({ activityId: sub_session_activity_id })) as SessionActivitySpecs;
 
-        if (currentSession) {
-          const currentSubSession = currentSession[currentSession.length - 1];
+      if (updatedUser) {
+        res.cookie('Web3Mastery_SecretRefreshToken', refreshToken, {
+          // domain: 'localhost:3000',
+          // path: '/',
+          httpOnly: true,
+          secure: true, // prevents "man-in-the-middle" attacks
+          sameSite: 'strict', // Prevent CSRF attacks
+          maxAge: 24 * 60 * 60 * 1000 // 1 day
+        });
 
-          const currentSessionId = currentSubSession?.sessionId;
+        //   const { accessToken } = generatedTokens as { accessToken: string };
 
-          const newSessionId = Number(currentSessionId) + 1;
+        // console.log(`user is ${user}`);
 
-          const currentTimeInMilliseconds = Date.now();
-
-          const newCurrentSubSessionObject = {
-            checkInTime: currentTimeInMilliseconds.toString(),
-            subSessionActivity: 'user log-in',
-            sessionId: newSessionId.toString() // same id since they are on the same session
-          };
-
-          user.sessions?.push([newCurrentSubSessionObject]);
-
-          const updatedUser = await findAndUpdateUser({
-            email: user.email,
-            requestBody: {
-              sessions: user.sessions,
-              accessToken: accessToken
-            }
-          });
-
-          if (updatedUser) {
-            // set refresh token as cookie for authorization purposes
-            res.cookie('Web3Mastery_SecretRefreshToken', refreshToken, {
-              // domain: 'localhost:3000',
-              // path: '/',
-              httpOnly: true,
-              secure: true, // prevents "man-in-the-middle" attacks
-              sameSite: 'strict', // Prevent CSRF attacks
-              maxAge: 24 * 60 * 60 * 1000 // 1 day
-            });
-
-            //   const { accessToken } = generatedTokens as { accessToken: string };
-
-            // console.log(`user is ${user}`);
-
-            return res.status(200).json({
-              responseMessage: 'user logged in successfully',
-              response: {
-                user: updatedUser
-              }
-            });
+        return res.status(200).json({
+          responseMessage: 'user logged in successfully',
+          response: {
+            user: updatedUser
           }
-        }
+        });
       }
     }
+
+    return;
   } catch (error) {
     if (error instanceof Error) {
       return res.status(500).json({

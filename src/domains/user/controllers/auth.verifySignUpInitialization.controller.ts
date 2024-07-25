@@ -33,7 +33,7 @@ const verifySignUpInitialization = async (req: Request<{}, ResponseSpecs, inSpec
 
   try {
     // console.log(req.user);
-    if (req.user) {
+    if (req.user && req.user.sessionStatus) {
       const existingUser = await findUser({ email: req.user.userEmail });
 
       if (existingUser) {
@@ -104,6 +104,8 @@ const verifySignUpInitialization = async (req: Request<{}, ResponseSpecs, inSpec
         // const twentyHoursInMilliseconds = 60;
 
         // Check if the difference has exceeded 24 hours
+        const { newUserRefreshToken, sessionStatus } = req?.user;
+
         if (differenceInMilliseconds > twentyHoursInMilliseconds) {
           console.log('the pre-sign-up token has exceeded 24 hours.');
           await deletePreSignUpUser({ email: preSignUpUser.email });
@@ -113,8 +115,6 @@ const verifySignUpInitialization = async (req: Request<{}, ResponseSpecs, inSpec
             responseMessage: 'pre-sign-up token has expired'
           });
         } else {
-          const { newUserRefreshToken, sessionStatus } = req?.user;
-
           // update refresh token(cookie)
           res.cookie('Web3Mastery_SecretRefreshToken', newUserRefreshToken, {
             httpOnly: true,
