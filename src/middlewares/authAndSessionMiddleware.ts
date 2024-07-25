@@ -5,12 +5,14 @@ import type { UserSpecs } from '../domains/user/schemas/userSchema.zod.js';
 import { findUser } from '../domains/user/lib/user.findUser.service.js';
 import generateTokens from '../utils/generateTokens.js';
 import { findAndUpdateUser } from '../domains/user/lib/user.findAndUpdateUser.service.js';
+import { findSessionActivity } from '../domains/platform/lib/platform.findSessionActivity.service.js';
+import type { SessionActivitySpecs } from '../domains/platform/schemas/sessionActivity.schema.js';
 // import generateTokens from '../utils/generateTokens.js';
 
 type RequestHeaderContentSpecs = {
   authorization: string;
   email: string;
-  sub_session_activity: string;
+  sub_session_activity_id: string;
 };
 
 type ResponseSpecs = {
@@ -32,7 +34,7 @@ type JwtPayloadSpecs = {
 const authAndSessionsMiddleware = async (req: Request, res: Response<ResponseSpecs>, next: NextFunction) => {
   const requestHeaders = req.headers;
 
-  const { email, authorization, sub_session_activity } = requestHeaders as RequestHeaderContentSpecs;
+  const { email, authorization, sub_session_activity_id } = requestHeaders as RequestHeaderContentSpecs;
   const jwtSecret = process.env.JWT_SECRET as string;
 
   // console.log(email);
@@ -40,6 +42,15 @@ const authAndSessionsMiddleware = async (req: Request, res: Response<ResponseSpe
 
   try {
     // console.log('authAndSessionMiddleware started');
+
+    if (!email || !authorization || !sub_session_activity_id) {
+      return res.status(401).json({
+        error: 'access forbidden',
+        responseMessage: `request header data missing or is not provided: 'email', 'authorization', 
+        and 'sub_session_activity_id' must be provided as request header data`
+      });
+    }
+
     if (!req.headers.cookie || !req.headers.cookie.includes('Web3Mastery_SecretRefreshToken')) {
       return res.status(401).json({
         error: 'access forbidden',
@@ -64,6 +75,8 @@ const authAndSessionsMiddleware = async (req: Request, res: Response<ResponseSpe
         responseMessage: 'authorization string does not match expected(Bearer Token) result'
       });
     }
+
+    const currentSubSessionActivity = (await findSessionActivity({ activityId: sub_session_activity_id })) as SessionActivitySpecs;
 
     const returnedToken = authorization.split(' ')[1];
     // console.log(returnedToken);
@@ -112,7 +125,7 @@ const authAndSessionsMiddleware = async (req: Request, res: Response<ResponseSpe
 
           const newCurrentSubSessionObject = {
             checkInTime: currentTimeInMilliseconds.toString(),
-            subSessionActivity: sub_session_activity,
+            subSessionActivity: currentSubSessionActivity,
             sessionId: currentSessionId // same id since they are on the same session
           };
 
@@ -163,7 +176,8 @@ const authAndSessionsMiddleware = async (req: Request, res: Response<ResponseSpe
         userEmail: decodedJWT.userEmail,
         sessionStatus,
         newUserAccessToken: accessToken,
-        newUserRefreshToken: refreshToken
+        newUserRefreshToken: refreshToken,
+        subSessionActivityId: sub_session_activity_id
       };
     }
 
@@ -177,6 +191,8 @@ const authAndSessionsMiddleware = async (req: Request, res: Response<ResponseSpe
       then regenerate new tokens(access and refresh) and pass from middleware */
 
       const user = (await findUser({ email }))!;
+      const currentSubSessionActivity = (await findSessionActivity({ activityId: sub_session_activity_id })) as SessionActivitySpecs;
+
       // console.log(`catch block ${user}`);
 
       /* Needed to get user, and perform a DB check afresh so that TS won't complain that user might be undefined, but 
@@ -247,11 +263,11 @@ const authAndSessionsMiddleware = async (req: Request, res: Response<ResponseSpe
           const newSessionId = Number(currentSessionId) + 1;
 
           const currentTimeInMilliseconds = Date.now();
-          console.log(sub_session_activity);
+          // console.log(sub_session_activity);
 
           const newCurrentSubSessionObject = {
             checkInTime: currentTimeInMilliseconds.toString(),
-            subSessionActivity: sub_session_activity,
+            subSessionActivity: currentSubSessionActivity,
             sessionId: newSessionId.toString() // same id since they are on the same session
           };
 
@@ -275,12 +291,23 @@ const authAndSessionsMiddleware = async (req: Request, res: Response<ResponseSpe
         userEmail: user.email!,
         sessionStatus,
         newUserAccessToken: accessToken,
-        newUserRefreshToken: refreshToken
+        newUserRefreshToken: refreshToken,
+        subSessionActivityId: sub_session_activity_id
       };
 
       // console.log(req.user);
 
       next();
+    }
+
+    if (error instanceof Error) {
+      console.log(error.message);
+      // throw new Error(error.message);
+
+      return res.status(500).json({
+        responseMessage: 'request unsuccessful, please try again',
+        error: error.message as string
+      });
     } else {
       return res.status(500).json({
         responseMessage: 'request unsuccessful, please try again',
