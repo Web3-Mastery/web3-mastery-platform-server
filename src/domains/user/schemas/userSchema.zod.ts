@@ -94,6 +94,12 @@ export const userSchema = z.object({
       invalid_type_error: 'isRecruiterEnabled must be a boolean type'
     })
     .optional(),
+  isAdmin: z
+    .boolean({
+      // required_error: 'isRecruiterEnabled is required',
+      invalid_type_error: 'isAdmin must be a boolean type'
+    })
+    .optional(),
   savedJobs: z.array(jobSchema).optional(),
   bookMarks: z.array(postSchema).optional(),
   skills: z

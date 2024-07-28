@@ -11,6 +11,7 @@ type ResponseSpecs = {
   error?: string;
   responseMessage: string;
   response?: {
+    platformSessionActivitiesCount: number;
     platformSessionActivities: SessionActivitySpecs[];
   };
 };
@@ -40,6 +41,7 @@ const getAllPlatformSessionActivities = async (req: Request<{}, ResponseSpecs>, 
       return res.status(200).json({
         responseMessage: `user profile fetched successfully`,
         response: {
+          platformSessionActivitiesCount: platformSessionActivities.length,
           platformSessionActivities: platformSessionActivities
         }
       });
