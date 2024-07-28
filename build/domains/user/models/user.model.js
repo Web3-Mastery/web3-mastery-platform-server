@@ -72,6 +72,10 @@ const userSchema = new mongoose.Schema({
         type: Boolean
         // required: [true, 'isRecruiterEnabled is required']
     },
+    isAdmin: {
+        type: Boolean
+        // required: [true, 'isAdmin is required']
+    },
     savedJobs: {
         type: [Object],
         validate: {

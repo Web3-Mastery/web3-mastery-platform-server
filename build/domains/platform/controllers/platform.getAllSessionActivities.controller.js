@@ -21,6 +21,7 @@ const getAllPlatformSessionActivities = async (req, res) => {
             return res.status(200).json({
                 responseMessage: `user profile fetched successfully`,
                 response: {
+                    platformSessionActivitiesCount: platformSessionActivities.length,
                     platformSessionActivities: platformSessionActivities
                 }
             });

@@ -5,7 +5,7 @@ const postSchema = new mongoose.Schema({
         required: [true, 'postTitle is required'],
         trim: true
     },
-    postSummary: {
+    postBrief: {
         type: String,
         required: [true, 'postSummary is required'],
         trim: true
@@ -15,7 +15,7 @@ const postSchema = new mongoose.Schema({
         required: [true, 'postBanner is required'],
         trim: true
     },
-    postedBy: {
+    postAuthor: {
         authorImage: {
             type: String,
             required: [true, 'authorImage is required'],
@@ -27,9 +27,12 @@ const postSchema = new mongoose.Schema({
             trim: true
         },
         authorId: {
-            type: String,
-            required: [true, 'authorId is required'],
-            trim: true
+            type: mongoose.Types.ObjectId,
+            ref: 'user',
+            unique: true
+            // type: String,
+            // // required: [true, 'authorId is required'],
+            // trim: true
         }
     },
     contributors: [
@@ -40,9 +43,12 @@ const postSchema = new mongoose.Schema({
                 trim: true
             },
             contributorId: {
-                type: String,
-                required: [true, 'contributorId is required'],
-                trim: true
+                type: mongoose.Types.ObjectId,
+                ref: 'user',
+                unique: true
+                // type: String,
+                // // required: [true, 'contributorId is required'],
+                // trim: true
             },
             contributorImage: {
                 type: String,
@@ -56,21 +62,58 @@ const postSchema = new mongoose.Schema({
         required: [true, 'postDate is required'],
         trim: true
     },
-    reactionsCount: {
-        type: String,
-        required: [true, 'reactionsCount is required'],
-        trim: true
+    reactions: {
+        reactedUsers: [
+            {
+                userId: {
+                    type: String,
+                    required: [true, 'reactedUserId is required'],
+                    trim: true
+                }
+            }
+        ],
+        reactionsCount: {
+            type: String,
+            required: [true, 'reactionsCount is required'],
+            trim: true
+        }
     },
-    bookmarksCount: {
-        type: String,
-        required: [true, 'bookmarksCount is required'],
-        trim: true
+    bookmarks: {
+        bookmarkedUsers: [
+            {
+                userId: {
+                    type: String,
+                    required: [true, 'bookmarkedUserId is required'],
+                    trim: true
+                }
+            }
+        ],
+        bookmarksCount: {
+            type: String,
+            required: [true, 'bookmarksCount is required'],
+            trim: true
+        }
     },
     postLink: {
         type: String,
         required: [true, 'postLink is required'],
         trim: true
+    },
+    postSlug: {
+        type: String,
+        required: [true, 'postLink is required'],
+        trim: true
     }
+    // userHasReacted: {
+    //   type: Boolean,
+    //   // required: [true, 'postLink is required'],
+    //   trim: true
+    // },
+    // userHasBookmarked: {
+    //   type: Boolean,
+    //   // required: [true, 'postLink is required'],
+    //   trim: true
+    // }
 }, {
     timestamps: true
 });
