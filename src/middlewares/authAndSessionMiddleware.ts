@@ -43,8 +43,15 @@ const authAndSessionsMiddleware = async (req: Request, res: Response<ResponseSpe
   try {
     // console.log('authAndSessionMiddleware started');
 
+    if (sub_session_activity_id.length !== 4) {
+      return res.status(403).json({
+        error: 'access forbidden',
+        responseMessage: `sub_session_activity_id: '${sub_session_activity_id}' is invalid`
+      });
+    }
+
     if (!email || !authorization || !sub_session_activity_id) {
-      return res.status(401).json({
+      return res.status(403).json({
         error: 'access forbidden',
         responseMessage: `request header data missing or is not provided: 'email', 'authorization', 
         and 'sub_session_activity_id' must be provided as request header data`
