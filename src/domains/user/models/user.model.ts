@@ -81,6 +81,10 @@ const userSchema = new mongoose.Schema<UserSpecs>(
       type: Boolean
       // required: [true, 'isAdmin is required']
     },
+    isCommunityMember: {
+      type: Boolean
+      // required: [true, 'isAdmin is required']
+    },
     savedJobs: {
       type: [Object],
       validate: {
