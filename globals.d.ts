@@ -1,4 +1,4 @@
-import type { Request } from 'express';
+import type { Request /* ,Response */ } from 'express';
 import * as z from 'zod';
 
 // Augment the Express Request type - more like extending express(with ts) globally
@@ -15,6 +15,13 @@ declare module 'express' {
       subSessionActivityId?: string;
     };
   }
+
+  // interface Response {
+  //   response?: {
+  //     accessToken: string;
+  //     tokenStatus: string;
+  //   };
+  // }
 }
 
 export const objectIdSchema = z.string().refine((val) => Types.ObjectId.isValid(val), {
