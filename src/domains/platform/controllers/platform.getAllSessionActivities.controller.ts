@@ -1,6 +1,6 @@
 import type { Request, Response } from 'express';
 import type { SessionActivitySpecs } from '../schemas/sessionActivity.schema.js';
-import { fetchAllPlatformSessionActivities } from '../lib/fetchAllSessionActivities.service.js';
+import { fetchAllPlatformSessionActivities } from '../lib/platform.fetchAllSessionActivities.service.js';
 
 // description: get user profile payout-data(by ID), and send back relevant data as response.
 // request: GET

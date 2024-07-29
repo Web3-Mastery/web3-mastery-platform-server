@@ -1,7 +1,7 @@
 import type { Request, Response } from 'express';
 import type { SessionActivitySpecs } from '../schemas/sessionActivity.schema.js';
 import { findSessionActivity } from '../lib/platform.findSessionActivity.service.js';
-import { findAndUpdateSessionActivity } from '../lib/findAndUpdateSessionActivity.service.js';
+import { findAndUpdateSessionActivity } from '../lib/platform.findAndUpdateSessionActivity.service.js';
 
 // description: updates a new platform session activity
 // request: POST

@@ -5,12 +5,12 @@ export async function findAndUpdateSessionActivity(data: { activityId?: string; 
   try {
     const { activityId, requestBody } = data;
 
-    const user = await sessionActivityModel.findOneAndUpdate({ activityId }, requestBody, {
+    const updatedSessionActivity = await sessionActivityModel.findOneAndUpdate({ activityId }, requestBody, {
       new: true,
       runValidators: true
     });
 
-    return user;
+    return updatedSessionActivity;
   } catch (error) {
     if (error instanceof Error) {
       console.log(error.message);

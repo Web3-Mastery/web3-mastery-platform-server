@@ -14,7 +14,8 @@ type ResponseSpecs = {
   error?: string | {};
   responseMessage: string;
   response?: {
-    sessionActivity: SessionActivitySpecs | DeleteResult;
+    deletedSessionActivity: SessionActivitySpecs;
+    deleteResult: DeleteResult;
   };
 };
 
@@ -52,11 +53,12 @@ const deletePlatformSessionActivity = async (req: Request<{}, ResponseSpecs, Ses
     //     sameSite: 'none', // Prevent CSRF attacks
     //     maxAge: 24 * 60 * 60 * 1000 // 1 day
 
-    if (deletedSessionActivity) {
+    if (deletedSessionActivity && deletedSessionActivity.acknowledged === true) {
       return res.status(201).json({
         responseMessage: 'session activity deleted successfully',
         response: {
-          sessionActivity: deletedSessionActivity
+          deletedSessionActivity: existingSessionActivity,
+          deleteResult: deletedSessionActivity
         }
       });
     }
