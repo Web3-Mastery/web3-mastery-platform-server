@@ -1,4 +1,4 @@
-import { fetchAllPlatformSessionActivities } from '../lib/fetchAllSessionActivities.service.js';
+import { fetchAllPlatformSessionActivities } from '../lib/platform.fetchAllSessionActivities.service.js';
 // @ts-ignore
 const getAllPlatformSessionActivities = async (req, res) => {
     try {

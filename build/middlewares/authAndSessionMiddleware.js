@@ -13,6 +13,12 @@ const authAndSessionsMiddleware = async (req, res, next) => {
     // console.log(authorization);
     try {
         // console.log('authAndSessionMiddleware started');
+        if (!sub_session_activity_id) {
+            return res.status(403).json({
+                error: 'access forbidden',
+                responseMessage: `sub_session_activity_id is not provided or is invalid`
+            });
+        }
         if (sub_session_activity_id.length !== 4) {
             return res.status(403).json({
                 error: 'access forbidden',

@@ -9,12 +9,12 @@ const getPost = async (req, res) => {
             const { subSessionActivityId: activityId, sessionStatus, userEmail, userId, newUserAccessToken, newUserRefreshToken } = req.user;
             const foundPost = await findPost({ postSlug });
             const user = await findUser({ email: userEmail });
-            if (!user) {
-                return res.status(403).json({
-                    error: 'request rejected',
-                    responseMessage: `user with id: '${userId}' not found or does not exist`
-                });
-            }
+            // if (!user) {
+            //   return res.status(403).json({
+            //     error: 'request rejected',
+            //     responseMessage: `user with id: '${userId}' not found or does not exist`
+            //   });
+            // }
             if (!foundPost) {
                 return res.status(400).json({
                     error: 'item not found',
@@ -44,20 +44,20 @@ const getPost = async (req, res) => {
                     // console.log(user.sessions);
                     const currentSession = user.sessions[user.sessions.length - 1];
                     if (currentSession) {
-                        const currentSubSession = currentSession[currentSession.length - 1];
-                        const currentSessionId = currentSubSession?.sessionId;
-                        const currentTimeInMilliseconds = Date.now();
+                        // const currentSubSession = currentSession[currentSession.length - 1];
+                        // const currentSessionId = currentSubSession?.sessionId;
+                        // const currentTimeInMilliseconds = Date.now();
                         const newCurrentSubSessionObject = {
-                            checkInTime: currentTimeInMilliseconds.toString(),
-                            subSessionActivity: currentUserSubSessionActivity,
-                            sessionId: currentSessionId // same id since they are on the same session
+                            // checkInTime: currentTimeInMilliseconds.toString(),
+                            subSessionActivity: currentUserSubSessionActivity
+                            // sessionId: currentSessionId // same id since they are on the same session
                         };
                         currentSession?.push(newCurrentSubSessionObject);
                         await findAndUpdateUser({
                             email: user.email,
                             requestBody: {
-                                sessions: user.sessions,
-                                accessToken: newUserAccessToken
+                                sessions: user.sessions
+                                // accessToken: newUserAccessToken
                             }
                         });
                         res.cookie('Web3Mastery_SecretRefreshToken', newUserRefreshToken, {
