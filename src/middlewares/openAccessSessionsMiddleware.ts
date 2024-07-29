@@ -20,7 +20,7 @@ type ResponseSpecs = {
   responseMessage: string;
   response?: {
     user: UserSpecs;
-    token: string;
+    // token: string;
   };
 };
 

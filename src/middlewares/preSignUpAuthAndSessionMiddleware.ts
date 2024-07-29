@@ -21,7 +21,7 @@ type ResponseSpecs = {
   responseMessage: string;
   response?: {
     user: UserSpecs;
-    token: string;
+    // token: string;
   };
 };
 
@@ -43,6 +43,20 @@ const authAndSessionsMiddleware = async (req: Request, res: Response<ResponseSpe
   // console.log(authorization);
 
   try {
+    if (!sub_session_activity_id) {
+      return res.status(403).json({
+        error: 'access forbidden',
+        responseMessage: `sub_session_activity_id is not provided or is invalid`
+      });
+    }
+
+    if (sub_session_activity_id.length !== 4) {
+      return res.status(403).json({
+        error: 'access forbidden',
+        responseMessage: `sub_session_activity_id: '${sub_session_activity_id}' is invalid`
+      });
+    }
+
     // console.log('authAndSessionMiddleware started');
     if (!email || !authorization || !sub_session_activity_id) {
       return res.status(401).json({

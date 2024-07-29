@@ -20,7 +20,7 @@ type ResponseSpecs = {
   responseMessage: string;
   response?: {
     user: UserSpecs;
-    token: string;
+    // token: string;
   };
 };
 
@@ -42,6 +42,12 @@ const authAndSessionsMiddleware = async (req: Request, res: Response<ResponseSpe
 
   try {
     // console.log('authAndSessionMiddleware started');
+    if (!sub_session_activity_id) {
+      return res.status(403).json({
+        error: 'access forbidden',
+        responseMessage: `sub_session_activity_id is not provided or is invalid`
+      });
+    }
 
     if (sub_session_activity_id.length !== 4) {
       return res.status(403).json({
