@@ -2,9 +2,10 @@ import type { Request, Response } from 'express';
 import type { PostSpecs } from '../schemas/postSchema.zod.js';
 import { findPost } from '../lib/post.findPost.service.js';
 import { createPost } from '../lib/post.createPost.service.js';
-// description: creates a new platform session activity
+
+// description: creates a new platform post/content(only article-based posts/content for now)
 // request: POST
-// route: '/api/v1/platform/create-session-activity'
+// route: '/api/v1/post/register-post'
 // access: Public
 
 type ResponseSpecs = {
@@ -12,8 +13,9 @@ type ResponseSpecs = {
   responseMessage: string;
   response?: {
     registeredPost: PostSpecs;
+    accessToken: string;
+    sessionStatus?: string;
   };
-  sessionStatus?: string;
 };
 
 const registerPost = async (req: Request<{}, ResponseSpecs, PostSpecs>, res: Response<ResponseSpecs>) => {
@@ -21,7 +23,7 @@ const registerPost = async (req: Request<{}, ResponseSpecs, PostSpecs>, res: Res
 
   if (req.user) {
     try {
-      const { sessionStatus } = req.user;
+      const { sessionStatus, newUserAccessToken, newUserRefreshToken } = req.user;
 
       /* No need for a similar check as below, due to too much data: Zod and Mongoose will handle that. Ensure that both the Zod and
       Mongoose Schemas are strictly verified/confirmed to block incomplete or error submissions since there is no extra check here. */
@@ -43,13 +45,21 @@ const registerPost = async (req: Request<{}, ResponseSpecs, PostSpecs>, res: Res
 
       const registeredPost = await createPost({ postData: req.body });
 
-      if (registeredPost) {
-        return res.status(200).json({
-          responseMessage: 'post registered successfully',
+      if (registeredPost && newUserAccessToken) {
+        res.cookie('Web3Mastery_SecretRefreshToken', newUserRefreshToken, {
+          httpOnly: true,
+          secure: true,
+          sameSite: 'none', // Prevent CSRF attacks
+          maxAge: 24 * 60 * 60 * 1000 // 1 day
+        });
+
+        return res.status(201).json({
+          responseMessage: 'post registered/created successfully',
           response: {
-            registeredPost
-          },
-          sessionStatus
+            registeredPost,
+            accessToken: newUserAccessToken,
+            sessionStatus
+          }
         });
       }
       // }

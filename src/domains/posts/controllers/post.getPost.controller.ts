@@ -5,10 +5,10 @@ import { findUser } from '../../user/lib/user.findUser.service.js';
 import { findSessionActivity } from '../../platform/lib/platform.findSessionActivity.service.js';
 import { findAndUpdateUser } from '../../user/lib/user.findAndUpdateUser.service.js';
 
-// description: get user profile payout-data(by ID), and send back relevant data as response.
+// description: gets a platform post and also registers relevant data about that post on on the user's sub-session
 // request: GET
-// route: '/api/v1/platform/get-session-activity";
-// access: Private | external
+// route: '/api/v1/post/get-post";
+// access: Public
 
 type ResponseSpecs = {
   error?: string;
@@ -24,7 +24,7 @@ type ResponseSpecs = {
   };
 };
 
-const getPost = async (req: Request<{ activityId: string }, ResponseSpecs>, res: Response<ResponseSpecs>) => {
+const getPost = async (req: Request<{}, ResponseSpecs>, res: Response<ResponseSpecs>) => {
   if (req.user) {
     try {
       const { postSlug } = req.body;
@@ -34,12 +34,12 @@ const getPost = async (req: Request<{ activityId: string }, ResponseSpecs>, res:
 
       const user = await findUser({ email: userEmail });
 
-      if (!user) {
-        return res.status(403).json({
-          error: 'request rejected',
-          responseMessage: `user with id: '${userId}' not found or does not exist`
-        });
-      }
+      // if (!user) {
+      //   return res.status(403).json({
+      //     error: 'request rejected',
+      //     responseMessage: `user with id: '${userId}' not found or does not exist`
+      //   });
+      // }
 
       if (!foundPost) {
         return res.status(400).json({
@@ -78,16 +78,16 @@ const getPost = async (req: Request<{ activityId: string }, ResponseSpecs>, res:
           const currentSession = user.sessions[user.sessions.length - 1];
 
           if (currentSession) {
-            const currentSubSession = currentSession[currentSession.length - 1];
+            // const currentSubSession = currentSession[currentSession.length - 1];
 
-            const currentSessionId = currentSubSession?.sessionId;
+            // const currentSessionId = currentSubSession?.sessionId;
 
-            const currentTimeInMilliseconds = Date.now();
+            // const currentTimeInMilliseconds = Date.now();
 
             const newCurrentSubSessionObject = {
-              checkInTime: currentTimeInMilliseconds.toString(),
-              subSessionActivity: currentUserSubSessionActivity,
-              sessionId: currentSessionId // same id since they are on the same session
+              // checkInTime: currentTimeInMilliseconds.toString(),
+              subSessionActivity: currentUserSubSessionActivity
+              // sessionId: currentSessionId // same id since they are on the same session
             };
 
             currentSession?.push(newCurrentSubSessionObject);
@@ -95,8 +95,8 @@ const getPost = async (req: Request<{ activityId: string }, ResponseSpecs>, res:
             await findAndUpdateUser({
               email: user.email,
               requestBody: {
-                sessions: user.sessions,
-                accessToken: newUserAccessToken
+                sessions: user.sessions
+                // accessToken: newUserAccessToken
               }
             });
 
