@@ -69,7 +69,9 @@ const postSchema = new mongoose.Schema<PostSpecs>(
       reactedUsers: [
         {
           userId: {
-            type: String,
+            type: mongoose.Types.ObjectId,
+            ref: 'user',
+            unique: true,
             required: [true, 'reactedUserId is required'],
             trim: true
           }
@@ -85,8 +87,10 @@ const postSchema = new mongoose.Schema<PostSpecs>(
       bookmarkedUsers: [
         {
           userId: {
-            type: String,
-            required: [true, 'bookmarkedUserId is required'],
+            type: mongoose.Types.ObjectId,
+            ref: 'user',
+            unique: true,
+            required: [true, 'bookmarkUserId is required'],
             trim: true
           }
         }

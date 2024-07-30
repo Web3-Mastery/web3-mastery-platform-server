@@ -4,17 +4,18 @@ import { findPost } from '../lib/post.findPost.service.js';
 import { findUser } from '../../user/lib/user.findUser.service.js';
 import { findSessionActivity } from '../../platform/lib/platform.findSessionActivity.service.js';
 import { findAndUpdateUser } from '../../user/lib/user.findAndUpdateUser.service.js';
+import { findAndUpdatePost } from '../lib/post.findAndUpdatePost.service.js';
 
-// description: gets a platform post and also registers relevant data about that post on on the user's sub-session
-// request: GET
-// route: '/api/v1/post/get-post";
+// description: increases the post-bookmark count and indicates(on the response) that the user has bookmarked the post
+// request: PATCH
+// route: '/api/v1/post/bookmark-post";
 // access: Public
 
 type ResponseSpecs = {
   error?: string;
   responseMessage: string;
   response?: {
-    fetchedPost: PostSpecs;
+    bookmarkedPost: PostSpecs;
     accessToken: string;
     extraData: {
       userHasReacted: boolean;
@@ -24,7 +25,7 @@ type ResponseSpecs = {
   };
 };
 
-const getPost = async (req: Request<{ postSlug: string }, ResponseSpecs>, res: Response<ResponseSpecs>) => {
+const bookmarkPost = async (req: Request<{ postSlug: string }, ResponseSpecs>, res: Response<ResponseSpecs>) => {
   if (req.user) {
     try {
       const { postSlug } = req.params;
@@ -33,13 +34,6 @@ const getPost = async (req: Request<{ postSlug: string }, ResponseSpecs>, res: R
       const foundPost = await findPost({ postSlug });
 
       const user = await findUser({ email: userEmail });
-
-      // if (!user) {
-      //   return res.status(403).json({
-      //     error: 'request rejected',
-      //     responseMessage: `user with id: '${userId}' not found or does not exist`
-      //   });
-      // }
 
       if (!foundPost) {
         return res.status(400).json({
@@ -51,15 +45,27 @@ const getPost = async (req: Request<{ postSlug: string }, ResponseSpecs>, res: R
       // get current user activity
       const currentUserSubSessionActivity = await findSessionActivity({ activityId });
 
-      const reactedUsers = foundPost.reactions.reactedUsers;
+      if (foundPost && user && currentUserSubSessionActivity && newUserAccessToken && userId && newUserRefreshToken) {
+        // increase postBookmarkCount
+        const currentPostBookmarkCount = foundPost.bookmarks.bookmarksCount;
 
-      const bookmarkedUsers = foundPost.bookmarks.bookmarkedUsers;
+        const newCurrentPostBookmarkCount = Number(currentPostBookmarkCount) + 1;
 
-      if (currentUserSubSessionActivity && newUserAccessToken && userId && newUserRefreshToken) {
-        // check if user has liked this post
-        const hasUserReacted = reactedUsers?.find((each) => {
-          return (each.userId = userId);
+        // add reacting user to postReactionUsers list
+        const newBookmarkUsersArray = [...foundPost.bookmarks.bookmarkedUsers, { userId: user._id }];
+
+        const updatedPostData = await findAndUpdatePost({
+          postSlug: postSlug,
+          postData: {
+            ...foundPost,
+            bookmarks: {
+              bookmarksCount: newCurrentPostBookmarkCount.toString(),
+              bookmarkedUsers: newBookmarkUsersArray
+            }
+          }
         });
+
+        const bookmarkedUsers = foundPost.bookmarks.bookmarkedUsers;
 
         // check if user has bookmarked this post
         const hasUserBookmarked = bookmarkedUsers?.find((each) => {
@@ -100,25 +106,34 @@ const getPost = async (req: Request<{ postSlug: string }, ResponseSpecs>, res: R
               }
             });
 
-            res.cookie('Web3Mastery_SecretRefreshToken', newUserRefreshToken, {
-              httpOnly: true,
-              secure: true,
-              sameSite: 'none', // Prevent CSRF attacks
-              maxAge: 24 * 60 * 60 * 1000 // 1 day
-            });
+            if (updatedPostData) {
+              const bookmarkedUsers = updatedPostData.reactions.reactedUsers;
 
-            return res.status(200).json({
-              responseMessage: `user profile fetched successfully`,
-              response: {
-                fetchedPost: foundPost,
-                accessToken: newUserAccessToken,
-                extraData: {
-                  userHasReacted: hasUserReacted ? true : false,
-                  userHasBookmarked: hasUserBookmarked ? true : false
-                },
-                sessionStatus: sessionStatus
-              }
-            });
+              // check if user has liked this post
+              const hasUserReacted = bookmarkedUsers?.find((each) => {
+                return (each.userId = userId);
+              });
+
+              res.cookie('Web3Mastery_SecretRefreshToken', newUserRefreshToken, {
+                httpOnly: true,
+                secure: true,
+                sameSite: 'none', // Prevent CSRF attacks
+                maxAge: 24 * 60 * 60 * 1000 // 1 day
+              });
+
+              return res.status(200).json({
+                responseMessage: `user profile fetched successfully`,
+                response: {
+                  bookmarkedPost: updatedPostData,
+                  accessToken: newUserAccessToken,
+                  extraData: {
+                    userHasReacted: hasUserReacted ? true : false,
+                    userHasBookmarked: hasUserBookmarked ? true : false
+                  },
+                  sessionStatus: sessionStatus
+                }
+              });
+            }
           }
 
           return;
@@ -146,4 +161,4 @@ const getPost = async (req: Request<{ postSlug: string }, ResponseSpecs>, res: R
   return;
 };
 
-export default getPost;
+export default bookmarkPost;
