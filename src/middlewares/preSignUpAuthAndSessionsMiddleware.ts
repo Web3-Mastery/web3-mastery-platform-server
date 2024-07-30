@@ -32,7 +32,7 @@ type JwtPayloadSpecs = {
   exp: number;
 };
 
-const authAndSessionsMiddleware = async (req: Request, res: Response<ResponseSpecs>, next: NextFunction) => {
+const preSignUpAuthAndSessionsMiddleware = async (req: Request, res: Response<ResponseSpecs>, next: NextFunction) => {
   const requestHeaders = req.headers;
   console.log(requestHeaders);
 
@@ -278,4 +278,4 @@ const authAndSessionsMiddleware = async (req: Request, res: Response<ResponseSpe
   return;
 };
 
-export default authAndSessionsMiddleware;
+export default preSignUpAuthAndSessionsMiddleware;

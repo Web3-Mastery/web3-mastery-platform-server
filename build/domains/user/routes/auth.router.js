@@ -3,7 +3,7 @@ import { validateData } from '../../../middlewares/validateDataMiddleware.js';
 import { userSchema } from '../schemas/userSchema.zod.js';
 import startUserSignUp from '../controllers/auth.startUserSignUp.controller.js';
 import verifySignUpInitialization from '../controllers/auth.verifySignUpInitialization.controller.js';
-import preSignUpAuthAndSessionMiddleware from '../../../middlewares/preSignUpAuthAndSessionMiddleware.js';
+import preSignUpAuthAndSessionMiddleware from '../../../middlewares/preSignUpAuthAndSessionsMiddleware.js';
 import completeSignUp from '../controllers/auth.completeSignUp.controller.js';
 import { z } from 'zod';
 import loginUser from '../controllers/auth.login.controller.js';
