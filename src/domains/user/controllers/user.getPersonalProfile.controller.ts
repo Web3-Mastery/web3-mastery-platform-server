@@ -2,16 +2,16 @@ import type { Request, Response } from 'express';
 import { findUser } from '../lib/user.findUser.service.js';
 import type { UserSpecs } from '../schemas/userSchema.zod.js';
 
-// description: get the profile of any user.
+// description: get personal(user) profile(by ID), and send back relevant data as response.
 // request: GET
-// route: '/api/v1/user/get-user-profile/:userId";
-// access: Public
+// route: '/api/v1/user/get-personal-profile/:userId";
+// access: Private
 
 type ResponseSpecs = {
   error?: string;
   responseMessage: string;
   response?: {
-    userProfile: UserSpecs;
+    personalProfile: UserSpecs;
   };
   sessionStatus?: string;
 };
@@ -30,20 +30,12 @@ const getUserProfileData = async (req: Request<{ userId: string }, ResponseSpecs
         });
       }
 
-      const publicUserProfile = {
-        name: user.name,
-        bio: user.bio,
-        website: user.website,
-        linkedInProfile: user.linkedInProfile,
-        githubProfile: user.githubProfile,
-        twitterProfile: user.twitterProfile,
-        youtubeProfile: user.youtubeProfile,
-        communityRank: user.communityRank,
-        skills: user.skills,
-        education: user.education,
-        experience: user.experience,
-        resume: user.resume
-      };
+      if (req.user.userId !== userId) {
+        return res.status(403).json({
+          error: 'user error',
+          responseMessage: `user/email provided in request header is not authorized to fetch data for user with id: '${userId}'`
+        });
+      }
 
       const { newUserRefreshToken, sessionStatus } = req?.user;
 
@@ -58,7 +50,7 @@ const getUserProfileData = async (req: Request<{ userId: string }, ResponseSpecs
       return res.status(200).json({
         responseMessage: `user profile fetched successfully`,
         response: {
-          userProfile: publicUserProfile
+          personalProfile: user
         },
         sessionStatus
       });

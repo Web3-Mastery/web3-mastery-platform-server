@@ -66,7 +66,8 @@ const userSchema = new mongoose.Schema<UserSpecs>(
       // required: [true, 'resume is required']
     },
     communityRank: {
-      type: String
+      type: String,
+      default: 'unclassified'
       // required: [true, 'communityRank is required']
     },
     walletAddress: {
