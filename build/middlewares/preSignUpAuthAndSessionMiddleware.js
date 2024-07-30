@@ -7,7 +7,7 @@ import { findPreSignUpUser } from '../domains/user/lib/user.findPreSignUpUser.se
 import { findAndUpdatePreSignUpUser } from '../domains/user/lib/user.findAndUpdatePreSignUpUser.service.js';
 // import generateTokens from '../utils/generateTokens.js';
 import { findSessionActivity } from '../domains/platform/lib/platform.findSessionActivity.service.js';
-const authAndSessionsMiddleware = async (req, res, next) => {
+const preSignUpAuthAndSessionsMiddleware = async (req, res, next) => {
     const requestHeaders = req.headers;
     console.log(requestHeaders);
     const { email, authorization, sub_session_activity_id } = requestHeaders;
@@ -200,4 +200,4 @@ const authAndSessionsMiddleware = async (req, res, next) => {
     }
     return;
 };
-export default authAndSessionsMiddleware;
+export default preSignUpAuthAndSessionsMiddleware;

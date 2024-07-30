@@ -1,12 +1,20 @@
 import { findPost } from '../../posts/lib/post.findPost.service.js';
 import { deletePost } from '../lib/post.deletePost.service.js';
 import { findUser } from '../../user/lib/user.findUser.service.js';
+import { findSessionActivity } from '../lib/platform.findSessionActivity.service.js';
+import { findAndUpdateUser } from '../../user/lib/user.findAndUpdateUser.service.js';
 const deletePlatformPost = async (req, res) => {
     const { postSlug } = req.body;
     if (req.user) {
         try {
-            const { userEmail, sessionStatus, newUserAccessToken, newUserRefreshToken } = req.user;
+            const { userEmail, sessionStatus, newUserAccessToken, newUserRefreshToken, subSessionActivityId: activityId } = req.user;
             const user = await findUser({ email: userEmail });
+            if (!user || user.isAdmin !== true) {
+                return res.status(403).json({
+                    error: 'request rejected',
+                    responseMessage: 'only platform administrators are allowed to perform this process'
+                });
+            }
             if (!user || user.isAdmin !== true) {
                 return res.status(403).json({
                     error: 'request rejected',
@@ -29,23 +37,57 @@ const deletePlatformPost = async (req, res) => {
                 });
             }
             const deletedPost = await deletePost({ postSlug: postSlug });
-            if (deletedPost && deletedPost.acknowledged === true && newUserAccessToken) {
-                res.cookie('Web3Mastery_SecretRefreshToken', newUserRefreshToken, {
-                    httpOnly: true,
-                    secure: true,
-                    sameSite: 'none', // Prevent CSRF attacks
-                    maxAge: 24 * 60 * 60 * 1000 // 1 day
-                });
-                return res.status(201).json({
-                    responseMessage: 'post/content was un-registered/deleted successfully',
-                    response: {
-                        deleteResult: deletedPost,
-                        deletedPost: existingPost,
-                        accessToken: newUserAccessToken,
-                        sessionStatus
-                    }
-                });
+            const currentUserSubSessionActivity = await findSessionActivity({ activityId });
+            if (currentUserSubSessionActivity &&
+                user?.sessions &&
+                user?.sessions.length > 0 &&
+                deletedPost &&
+                deletedPost.acknowledged === true &&
+                newUserAccessToken) {
+                // console.log(user.sessions);
+                currentUserSubSessionActivity.contentActivityData = {
+                    contentType: 'article',
+                    contentTitle: existingPost.postTitle,
+                    contentId: existingPost._id && existingPost._id,
+                    contentUrl: existingPost.postLink
+                };
+                const currentSession = user.sessions[user.sessions.length - 1];
+                if (currentSession) {
+                    // const currentSubSession = currentSession[currentSession.length - 1];
+                    // const currentSessionId = currentSubSession?.sessionId;
+                    // const currentTimeInMilliseconds = Date.now();
+                    const newCurrentSubSessionObject = {
+                        // checkInTime: currentTimeInMilliseconds.toString(),
+                        subSessionActivity: currentUserSubSessionActivity
+                        // sessionId: currentSessionId // same id since they are on the same session
+                    };
+                    currentSession?.push(newCurrentSubSessionObject);
+                    await findAndUpdateUser({
+                        email: user.email,
+                        requestBody: {
+                            sessions: user.sessions
+                            // accessToken: newUserAccessToken
+                        }
+                    });
+                    res.cookie('Web3Mastery_SecretRefreshToken', newUserRefreshToken, {
+                        httpOnly: true,
+                        secure: true,
+                        sameSite: 'none', // Prevent CSRF attacks
+                        maxAge: 24 * 60 * 60 * 1000 // 1 day
+                    });
+                    return res.status(201).json({
+                        responseMessage: 'post/content was un-registered/deleted successfully',
+                        response: {
+                            deleteResult: deletedPost,
+                            deletedPost: existingPost,
+                            accessToken: newUserAccessToken,
+                            sessionStatus
+                        }
+                    });
+                }
+                return;
             }
+            return;
             // }
         }
         catch (error) {

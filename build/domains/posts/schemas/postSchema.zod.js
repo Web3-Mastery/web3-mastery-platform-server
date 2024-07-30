@@ -6,8 +6,12 @@ export const postSchema = z.object({
         invalid_type_error: 'postTitle must be a string'
     }),
     postBrief: z.string({
-        required_error: 'postSummary is required',
-        invalid_type_error: 'postSummary must be a string'
+        required_error: 'postBrief is required',
+        invalid_type_error: 'postBrief must be a string'
+    }),
+    postCategory: z.string({
+        required_error: 'postCategory is required',
+        invalid_type_error: 'postCategory must be a string'
     }),
     postBanner: z.string({
         required_error: 'postBanner is required',

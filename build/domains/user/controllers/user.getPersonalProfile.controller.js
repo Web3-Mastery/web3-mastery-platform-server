@@ -10,20 +10,12 @@ const getUserProfileData = async (req, res) => {
                     responseMessage: `user with this Id: 'userId' not found or does not exist`
                 });
             }
-            const publicUserProfile = {
-                name: user.name,
-                bio: user.bio,
-                website: user.website,
-                linkedInProfile: user.linkedInProfile,
-                githubProfile: user.githubProfile,
-                twitterProfile: user.twitterProfile,
-                youtubeProfile: user.youtubeProfile,
-                communityRank: user.communityRank,
-                skills: user.skills,
-                education: user.education,
-                experience: user.experience,
-                resume: user.resume
-            };
+            if (req.user.userId !== userId) {
+                return res.status(403).json({
+                    error: 'user error',
+                    responseMessage: `user/email provided in request header is not authorized to fetch data for user with id: '${userId}'`
+                });
+            }
             const { newUserRefreshToken, sessionStatus } = req?.user;
             // update refresh token(cookie)
             res.cookie('Web3Mastery_SecretRefreshToken', newUserRefreshToken, {
@@ -35,7 +27,7 @@ const getUserProfileData = async (req, res) => {
             return res.status(200).json({
                 responseMessage: `user profile fetched successfully`,
                 response: {
-                    userProfile: publicUserProfile
+                    personalProfile: user
                 },
                 sessionStatus
             });

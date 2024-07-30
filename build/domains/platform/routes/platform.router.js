@@ -8,6 +8,9 @@ import getSessionActivity from '../controllers/platform.getSessionActivity.contr
 import { sessionActivitySchema } from '../schemas/sessionActivity.schema.js';
 // import verifyAdminMiddleware from '../../../middlewares/verifyAdminMiddleware.js';
 import deletePlatformPost from '../controllers/platform.deletePost.controller.js';
+import registerPost from '../controllers/post.registerPost.controller.js';
+import updatePlatformPost from '../controllers/platform.updatePost.controller.js';
+import authAndSessionsMiddleware from '../../../middlewares/authAndSessionMiddleware.js';
 // import { ObjectId } from 'mongodb';
 // import * as z from 'zod';
 // express router init
@@ -32,14 +35,18 @@ const router = express.Router();
 // routes
 router.route('/create-session-activity').post(validateData({ body: sessionActivitySchema }), createSessionActivityController);
 router.route('/delete-session-activity').delete(deletePlatformSessionActivity);
-router.route('/delete-post').delete(deletePlatformPost);
 router.route('/get-all-platform-session-activity').get(getAllPlatformSessionActivities);
 router.route('/get-session-activity/:activityId').get(getSessionActivity);
 router.route('/update-session-activity').patch(validateData({ body: sessionActivitySchema }), updateSessionActivityController);
+router.route('/register-post').post(authAndSessionsMiddleware, registerPost);
+router.route('/update-post').patch(authAndSessionsMiddleware, updatePlatformPost);
+router.route('/delete-post').delete(authAndSessionsMiddleware, deletePlatformPost);
 // router.route('/create-session-activity').post(validateData({ body: sessionActivitySchema }), verifyAdminMiddleware, createSessionActivityController);
 // router.route('/delete-session-activity').delete(verifyAdminMiddleware, deletePlatformSessionActivity);
-// router.route('/delete-post').delete(verifyAdminMiddleware, deletePlatformPost);
 // router.route('/get-all-platform-session-activity').get(verifyAdminMiddleware, getAllPlatformSessionActivities);
 // router.route('/get-session-activity/:activityId').get(verifyAdminMiddleware, getSessionActivity);
 // router.route('/update-session-activity').patch(validateData({ body: sessionActivitySchema }), verifyAdminMiddleware, updateSessionActivityController);
+// router.route('/register-post').post(verifyAdminMiddleware, registerPost);
+// router.route('/update-post').patch(verifyAdminMiddleware, updatePlatformPost);
+// router.route('/delete-post').delete(verifyAdminMiddleware, deletePlatformPost);
 export default router;

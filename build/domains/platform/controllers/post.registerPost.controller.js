@@ -1,21 +1,13 @@
 import { findPost } from '../../posts/lib/post.findPost.service.js';
+import { createPost } from '../../posts/lib/post.createPost.service.js';
 import { findUser } from '../../user/lib/user.findUser.service.js';
-import { findAndUpdatePost } from '../lib/post.findAndUpdatePost.service.js';
 import { findSessionActivity } from '../lib/platform.findSessionActivity.service.js';
 import { findAndUpdateUser } from '../../user/lib/user.findAndUpdateUser.service.js';
-const updatePlatformPost = async (req, res) => {
-    const { currentPostSlug } = req.query;
-    const StringedCurrentPostSlug = currentPostSlug;
+const registerPost = async (req, res) => {
+    const { postSlug } = req.body;
     if (req.user) {
         try {
             const { userEmail, sessionStatus, newUserAccessToken, newUserRefreshToken, subSessionActivityId: activityId } = req.user;
-            const user = await findUser({ email: userEmail });
-            if (!user || user.isAdmin !== true) {
-                return res.status(403).json({
-                    error: 'request rejected',
-                    responseMessage: 'only platform administrators are allowed to perform this process'
-                });
-            }
             /* No need for a similar check as below, due to too much data: Zod and Mongoose will handle that. Ensure that both the Zod and
             Mongoose Schemas are strictly verified/confirmed to block incomplete or error submissions since there is no extra check here. */
             // if (!postTitle || !postSlug || !postBrief) {
@@ -24,22 +16,29 @@ const updatePlatformPost = async (req, res) => {
             //     responseMessage: 'request unsuccessful: please provide all activity data'
             //   });
             // }
-            const existingPost = await findPost({ postSlug: StringedCurrentPostSlug });
-            if (!existingPost) {
-                return res.status(400).json({
-                    error: 'process empty',
-                    responseMessage: `platform post with postSlug: '${StringedCurrentPostSlug} does not exist or has already been deleted`
+            const user = await findUser({ email: userEmail });
+            if (!user || user.isAdmin !== true) {
+                return res.status(403).json({
+                    error: 'request rejected',
+                    responseMessage: 'only platform administrators are allowed to perform this process'
                 });
             }
-            const updatedPost = await findAndUpdatePost({ postSlug: StringedCurrentPostSlug, requestBody: req.body });
+            const existingPost = await findPost({ postSlug: postSlug });
+            if (existingPost) {
+                return res.status(400).json({
+                    error: 'duplicate-post-detected',
+                    responseMessage: `request unsuccessful: a post with postSlug: '${postSlug}' already exist`
+                });
+            }
+            const registeredPost = await createPost({ postData: req.body });
             // get current user activity
             const currentUserSubSessionActivity = await findSessionActivity({ activityId });
-            if (user?.sessions && user?.sessions.length > 0 && updatedPost && newUserAccessToken && currentUserSubSessionActivity) {
+            if (user?.sessions && user?.sessions.length > 0 && registeredPost && newUserAccessToken && currentUserSubSessionActivity) {
                 currentUserSubSessionActivity.contentActivityData = {
                     contentType: 'article',
-                    contentTitle: updatedPost.postTitle,
-                    contentId: updatedPost._id && updatedPost._id,
-                    contentUrl: updatedPost.postLink
+                    contentTitle: registeredPost.postTitle,
+                    contentId: registeredPost._id && registeredPost._id,
+                    contentUrl: registeredPost.postLink
                 };
                 // console.log(user.sessions);
                 const currentSession = user.sessions[user.sessions.length - 1];
@@ -67,9 +66,9 @@ const updatePlatformPost = async (req, res) => {
                         maxAge: 24 * 60 * 60 * 1000 // 1 day
                     });
                     return res.status(201).json({
-                        responseMessage: 'post/content was un-registered/deleted successfully',
+                        responseMessage: 'post registered/created successfully',
                         response: {
-                            updatedPost: updatedPost,
+                            registeredPost,
                             accessToken: newUserAccessToken,
                             sessionStatus
                         }
@@ -77,7 +76,7 @@ const updatePlatformPost = async (req, res) => {
                 }
                 return;
             }
-            // }
+            return;
         }
         catch (error) {
             if (error instanceof Error) {
@@ -100,4 +99,4 @@ const updatePlatformPost = async (req, res) => {
     // }
     return;
 };
-export default updatePlatformPost;
+export default registerPost;
