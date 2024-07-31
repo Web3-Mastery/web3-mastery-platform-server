@@ -26,7 +26,7 @@ const registerPost = async (req, res) => {
             const existingPost = await findPost({ postSlug: postSlug });
             if (existingPost) {
                 return res.status(400).json({
-                    error: 'duplicate-post-detected',
+                    error: 'duplicate post detected',
                     responseMessage: `request unsuccessful: a post with postSlug: '${postSlug}' already exist`
                 });
             }

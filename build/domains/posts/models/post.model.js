@@ -107,6 +107,16 @@ const postSchema = new mongoose.Schema({
         type: String,
         required: [true, 'postLink is required'],
         trim: true
+    },
+    postCategory: {
+        type: String,
+        required: [true, 'postCategory is required'],
+        trim: true
+    },
+    postContentType: {
+        type: String,
+        required: [true, 'postContentType is required'],
+        trim: true
     }
     // userHasReacted: {
     //   type: Boolean,
