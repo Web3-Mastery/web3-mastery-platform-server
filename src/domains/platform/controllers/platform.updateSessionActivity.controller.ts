@@ -4,7 +4,7 @@ import { findSessionActivity } from '../lib/platform.findSessionActivity.service
 import { findAndUpdateSessionActivity } from '../lib/platform.findAndUpdateSessionActivity.service.js';
 
 // description: updates a new platform session activity
-// request: POST
+// request: PATCH
 // route: '/api/v1/platform/update-session-activity'
 // access: Public
 

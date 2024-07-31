@@ -50,7 +50,7 @@ const registerPost = async (req: Request<{}, ResponseSpecs, PostSpecs>, res: Res
 
       if (existingPost) {
         return res.status(400).json({
-          error: 'duplicate-post-detected',
+          error: 'duplicate post detected',
           responseMessage: `request unsuccessful: a post with postSlug: '${postSlug}' already exist`
         });
       }

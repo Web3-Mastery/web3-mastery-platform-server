@@ -24,4 +24,4 @@ const postCategorySchema = new mongoose.Schema(
   }
 );
 
-export default mongoose.model('PostCategory', postCategorySchema);
+export default mongoose.model('post-category', postCategorySchema);
