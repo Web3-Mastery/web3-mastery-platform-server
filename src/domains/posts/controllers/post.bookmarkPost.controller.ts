@@ -8,7 +8,7 @@ import { findAndUpdatePost } from '../lib/post.findAndUpdatePost.service.js';
 
 // description: increases the post-bookmark count and indicates(on the response) that the user has bookmarked the post
 // request: PATCH
-// route: '/api/v1/post/bookmark-post";
+// route: '/api/v1/posts/bookmark-post";
 // access: Public
 
 type ResponseSpecs = {

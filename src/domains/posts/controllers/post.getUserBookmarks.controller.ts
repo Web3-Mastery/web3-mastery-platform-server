@@ -5,7 +5,7 @@ import { findAllPosts } from '../lib/post.findAllPosts.service.js';
 
 // description: gets all platform posts/content.
 // request: GET
-// route: '/api/v1/post/get-all-posts";
+// route: '/api/v1/posts/get-user-bookmarks/:userId";
 // access: Private | external
 
 type ResponseSpecs = {

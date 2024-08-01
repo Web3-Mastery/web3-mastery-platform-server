@@ -8,7 +8,7 @@ import { findAndUpdatePost } from '../lib/post.findAndUpdatePost.service.js';
 
 // description: increases the post-reaction count and indicates(on the response) that the user has reacted to the post
 // request: PATCH
-// route: '/api/v1/post/react-to-post";
+// route: '/api/v1/posts/react-to-post";
 // access: Public
 
 type ResponseSpecs = {

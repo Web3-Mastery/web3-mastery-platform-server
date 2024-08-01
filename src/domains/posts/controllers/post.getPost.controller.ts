@@ -7,7 +7,7 @@ import { findAndUpdateUser } from '../../user/lib/user.findAndUpdateUser.service
 
 // description: gets a platform post and also registers relevant data about that post on on the user's sub-session
 // request: GET
-// route: '/api/v1/post/get-post";
+// route: '/api/v1/posts/get-post";
 // access: Public
 
 type ResponseSpecs = {
