@@ -1,13 +1,12 @@
 import type { Request, Response } from 'express';
-import type { PostCategorySpecs } from '../schemas/postCategory.schema.js';
-import { findPostCategory } from '../lib/platform.findPostCategory.service.js';
-import { findUser } from '../../user/lib/user.findUser.service.js';
-import { createPostCategory } from '../lib/platform.createPostCategory.service.js';
+import type { PostCategorySpecs } from '../../schemas/postCategory.schema.js';
+import { findPostCategory } from '../../lib/platform.findPostCategory.service.js';
+import { findUser } from '../../../user/lib/user.findUser.service.js';
 
-// description: creates a new platform post/content category
-// request: POST
-// route: '/api/v1/platform/create-post-category'
-// access: Private(admin only)
+// description: get session activity, and send back relevant data as response.
+// request: GET
+// route: '/api/v1/platform/post-category-management/get-post-category/:categoryId";
+// access: Private(admin-only)
 
 type ResponseSpecs = {
   error?: string;
@@ -19,11 +18,12 @@ type ResponseSpecs = {
   };
 };
 
-const updatePlatformPost = async (req: Request<{}, ResponseSpecs, PostCategorySpecs>, res: Response<ResponseSpecs>) => {
+const getPostCategory = async (req: Request<{ categoryId: string }, ResponseSpecs>, res: Response<ResponseSpecs>) => {
   if (req.user) {
     try {
+      const { categoryId } = req.params;
+
       const { userEmail, sessionStatus, newUserAccessToken, newUserRefreshToken } = req.user;
-      const { categoryId } = req.body;
 
       const user = await findUser({ email: userEmail });
 
@@ -36,16 +36,15 @@ const updatePlatformPost = async (req: Request<{}, ResponseSpecs, PostCategorySp
 
       const existingPostCategory = await findPostCategory({ categoryId });
 
-      if (existingPostCategory) {
+      if (!existingPostCategory) {
         return res.status(400).json({
-          error: 'duplicate post category detected',
-          responseMessage: `request unsuccessful: a post category with categoryId: '${categoryId}' already exist`
+          error: 'item not found',
+          responseMessage: `post category with categoryId: '${categoryId}' not found or does not exist`
         });
       }
 
-      const newPostCategory = await createPostCategory({ postCategoryData: req.body });
-
-      if (newPostCategory && newUserAccessToken) {
+      if (existingPostCategory && newUserAccessToken) {
+        // update refresh token(cookie)
         res.cookie('Web3Mastery_SecretRefreshToken', newUserRefreshToken, {
           httpOnly: true,
           secure: true,
@@ -54,38 +53,32 @@ const updatePlatformPost = async (req: Request<{}, ResponseSpecs, PostCategorySp
         });
 
         return res.status(200).json({
-          responseMessage: 'post category created successfully',
+          responseMessage: `user profile fetched successfully`,
           response: {
-            postCategory: newPostCategory,
+            postCategory: existingPostCategory,
             accessToken: newUserAccessToken,
             sessionStatus
           }
         });
       }
 
-      // }
+      return;
     } catch (error) {
       if (error instanceof Error) {
-        console.log(error);
-        const errorString = error.message as string;
-
         return res.status(500).json({
-          responseMessage: 'process error',
-          error: errorString
+          responseMessage: 'request was unsuccessful',
+          error: error.message
         });
       } else {
-        console.log(error);
-
         return res.status(500).json({
-          responseMessage: 'process error: please try again',
+          responseMessage: 'request was unsuccessful: please try again',
           error: error as string
         });
       }
     }
   }
-  // }
 
   return;
 };
 
-export default updatePlatformPost;
+export default getPostCategory;

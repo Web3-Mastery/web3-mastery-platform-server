@@ -1,11 +1,11 @@
-import sessionActivityModel from '../models/sessionActivity.model.js';
-import type { SessionActivitySpecs } from '../schemas/sessionActivity.schema.js';
+import postCategoryModel from '../models/postCategory.model.js';
+import type { PostCategorySpecs } from '../schemas/postCategory.schema.js';
 
-export async function findAndUpdatePostCategory(data: { categoryId?: string; requestBody?: SessionActivitySpecs }) {
+export async function findAndUpdatePostCategory(data: { categoryId?: string; requestBody?: PostCategorySpecs }) {
   try {
     const { categoryId, requestBody } = data;
 
-    const updatedPostCategory = await sessionActivityModel.findOneAndUpdate({ categoryId }, requestBody, {
+    const updatedPostCategory = await postCategoryModel.findOneAndUpdate({ categoryId }, requestBody, {
       new: true,
       runValidators: true
     });

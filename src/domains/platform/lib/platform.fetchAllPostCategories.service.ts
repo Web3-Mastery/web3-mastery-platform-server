@@ -1,6 +1,6 @@
 import postCategoryModel from '../models/postCategory.model.js';
 
-export async function fetchAllPlatformSessionActivities() {
+export async function fetchAllPostCategories() {
   try {
     const platformPostCategories = await postCategoryModel.find({});
 

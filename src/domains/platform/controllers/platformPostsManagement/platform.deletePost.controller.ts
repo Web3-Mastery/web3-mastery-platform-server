@@ -1,15 +1,15 @@
 import type { Request, Response } from 'express';
 import type { DeleteResult } from 'mongodb';
-import type { PostSpecs } from '../../posts/schemas/postSchema.zod.js';
-import { findPost } from '../../posts/lib/post.findPost.service.js';
-import { deletePost } from '../lib/post.deletePost.service.js';
-import { findUser } from '../../user/lib/user.findUser.service.js';
-import { findSessionActivity } from '../lib/platform.findSessionActivity.service.js';
-import { findAndUpdateUser } from '../../user/lib/user.findAndUpdateUser.service.js';
+import type { PostSpecs } from '../../../posts/schemas/postSchema.zod.js';
+import { findPost } from '../../../posts/lib/post.findPost.service.js';
+import { deletePost } from '../../lib/post.deletePost.service.js';
+import { findUser } from '../../../user/lib/user.findUser.service.js';
+import { findSessionActivity } from '../../lib/platform.findSessionActivity.service.js';
+import { findAndUpdateUser } from '../../../user/lib/user.findAndUpdateUser.service.js';
 
 // description: deletes a new platform post/content(only article-based posts/content for now)
 // request: DELETE
-// route: '/api/v1/platform/delete-post'
+// route: '/api/v1/platform/platform-posts-management/delete-post'
 // access: Public
 
 type ResponseSpecs = {
