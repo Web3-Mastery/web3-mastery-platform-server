@@ -8,7 +8,10 @@ import log from './utils/logger.js';
 import newsletterRouter from './domains/newsletter/routes/newsletter.router.js';
 import authRouter from './domains/user/routes/auth.router.js';
 import userRouter from './domains/user/routes/user.router.js';
-import platformRouter from './domains/platform/routes/platform.router.js';
+import sessionActivityManagementRouter from './domains/platform/routes/platform.sessionActivityManagement.router.js';
+import postCategoryManagementRouter from './domains/platform/routes/platform.postCategoryManagement.router.js';
+import platformPostsManagementRouter from './domains/platform/routes/platform.platformPostsManagement.router.js';
+import platformPostsRouter from './domains/posts/routes/post.router.js';
 
 // import all types here
 import type { Request, Response } from 'express';
@@ -67,7 +70,10 @@ app.get('/', (req: Request, res: Response) => {
 app.use('/api/v1/newsletter-subscription', newsletterRouter);
 app.use('/api/v1/user', userRouter);
 app.use('/api/v1/auth', authRouter);
-app.use('/api/v1/platform', platformRouter);
+app.use('/api/v1/posts', platformPostsRouter);
+app.use('/api/v1/platform/platform-posts-management', platformPostsManagementRouter);
+app.use('/api/v1/platform/session-activity-management', sessionActivityManagementRouter);
+app.use('/api/v1/platform/post-category-management', postCategoryManagementRouter);
 
 const port = process.env.PORT || 5000;
 
