@@ -24,6 +24,9 @@ type ResponseSpecs = {
   };
 };
 
+/* A middleware that does not check for the refresh token. Basically it is used on the 'login' and 'start-signup' end-points
+One of it's core purpose is to create/start sessions */
+
 // @ts-ignore
 const openAccessSessionsMiddleware = async (req: Request, res: Response<ResponseSpecs>, next: NextFunction) => {
   try {

@@ -14,42 +14,33 @@ type ResponseSpecs = {
 };
 
 // @ts-ignore
-const verifyAdminMiddleware = async (req: Request, res: Response<ResponseSpecs>, next: NextFunction) => {
+const verifyAdminOrPrivacyMiddleware = async (req: Request<{ userId: string }, ResponseSpecs>, res: Response<ResponseSpecs>, next: NextFunction) => {
   if (req.user) {
     try {
       const { administratorEmail: email } = req.query;
-
+      const { userId } = req.params;
       const adminEmail = email as string;
 
-      // const { userEmail: email } = req.header;
+      const adminUser = await findUser({ email: adminEmail });
+      const user = await findUser({ id: userId });
 
-      // if (email !== emailFromRequestBody) {
-      //   return res.status(403).json({
-      //     error: 'user error',
-      //     responseMessage: `user/email provided in request header is not authorized to perform actions for user with email: '${emailFromRequestBody}'`
-      //   });
-      // }
-
-      const user = await findUser({ email: adminEmail });
-      // console.log(user);
-
-      // console.log('user', user);
-
-      if (!user) {
+      // if (user || adminUser) {
+      if (!user && !adminUser) {
         return res.status(403).json({
           error: 'request rejected',
-          responseMessage: `user with email: ${adminEmail} not found or does not exist`
+          responseMessage: `user not found or does not exist`
         });
       }
 
-      if (user.isAdmin !== true) {
+      if (adminUser?.isAdmin !== true && req.user.userId !== userId) {
         return res.status(403).json({
           error: 'request rejected',
-          responseMessage: 'only platform administrators are allowed to perform this activity'
+          responseMessage: `Only an admin or the user with this account can perform this action. 
+            If admin, pass query(administratorEmail) containing the admin-user's email, if user, 
+            pass param(userId) containing the user's platform id respectively.`
         });
+        // }
       }
-
-      // proceed to next middleware or route
 
       next();
       // }
@@ -65,4 +56,4 @@ const verifyAdminMiddleware = async (req: Request, res: Response<ResponseSpecs>,
   }
 };
 
-export default verifyAdminMiddleware;
+export default verifyAdminOrPrivacyMiddleware;
