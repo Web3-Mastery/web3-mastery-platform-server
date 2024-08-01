@@ -5,6 +5,8 @@ import { findPreSignUpUser } from '../domains/user/lib/user.findPreSignUpUser.se
 import { findAndUpdatePreSignUpUser } from '../domains/user/lib/user.findAndUpdatePreSignUpUser.service.js';
 import { findUser } from '../domains/user/lib/user.findUser.service.js';
 import { findAndUpdateUser } from '../domains/user/lib/user.findAndUpdateUser.service.js';
+/* A middleware that does not check for the refresh token. Basically it is used on the 'login' and 'start-signup' end-points
+One of it's core purpose is to create/start sessions */
 // @ts-ignore
 const openAccessSessionsMiddleware = async (req, res, next) => {
     try {

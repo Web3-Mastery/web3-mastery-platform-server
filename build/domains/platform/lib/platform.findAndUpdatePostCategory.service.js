@@ -1,8 +1,8 @@
-import sessionActivityModel from '../models/sessionActivity.model.js';
+import postCategoryModel from '../models/postCategory.model.js';
 export async function findAndUpdatePostCategory(data) {
     try {
         const { categoryId, requestBody } = data;
-        const updatedPostCategory = await sessionActivityModel.findOneAndUpdate({ categoryId }, requestBody, {
+        const updatedPostCategory = await postCategoryModel.findOneAndUpdate({ categoryId }, requestBody, {
             new: true,
             runValidators: true
         });
