@@ -1,6 +1,6 @@
-import { findPostCategory } from '../../lib/platform.findPostCategory.service.js';
+import { findPostCategory } from '../../lib/postCategoryManagement/platform.findPostCategory.service.js';
 import { findUser } from '../../../user/lib/user.findUser.service.js';
-import { createPostCategory } from '../../lib/platform.createPostCategory.service.js';
+import { createPostCategory } from '../../lib/postCategoryManagement/platform.createPostCategory.service.js';
 const createPlatformPostCategory = async (req, res) => {
     if (req.user) {
         try {

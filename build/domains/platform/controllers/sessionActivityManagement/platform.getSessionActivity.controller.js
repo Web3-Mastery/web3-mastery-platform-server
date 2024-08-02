@@ -1,4 +1,4 @@
-import { findSessionActivity } from '../../lib/platform.findSessionActivity.service.js';
+import { findSessionActivity } from '../../lib/sessionActivityManagement/platform.findSessionActivity.service.js';
 import { findUser } from '../../../user/lib/user.findUser.service.js';
 const getSessionActivity = async (req, res) => {
     if (req.user) {

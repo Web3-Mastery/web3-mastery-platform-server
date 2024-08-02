@@ -1,7 +1,7 @@
 import { findPost } from '../../../posts/lib/post.findPost.service.js';
-import { deletePost } from '../../lib/post.deletePost.service.js';
+import { deletePost } from '../../lib/platformPostsManagement/post.deletePost.service.js';
 import { findUser } from '../../../user/lib/user.findUser.service.js';
-import { findSessionActivity } from '../../lib/platform.findSessionActivity.service.js';
+import { findSessionActivity } from '../../lib/sessionActivityManagement/platform.findSessionActivity.service.js';
 import { findAndUpdateUser } from '../../../user/lib/user.findAndUpdateUser.service.js';
 const deletePlatformPost = async (req, res) => {
     const { postSlug } = req.body;
@@ -12,13 +12,7 @@ const deletePlatformPost = async (req, res) => {
             if (!user || user.isAdmin !== true) {
                 return res.status(403).json({
                     error: 'request rejected',
-                    responseMessage: 'only platform administrators are allowed to perform this process'
-                });
-            }
-            if (!user || user.isAdmin !== true) {
-                return res.status(403).json({
-                    error: 'request rejected',
-                    responseMessage: 'only platform administrators are allowed to perform this process'
+                    responseMessage: 'only platform administrators are allowed to perform this action'
                 });
             }
             /* No need for a similar check as below, due to too much data: Zod and Mongoose will handle that. Ensure that both the Zod and

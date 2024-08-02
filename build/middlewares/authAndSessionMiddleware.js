@@ -4,7 +4,7 @@ import {} from 'express';
 import { findUser } from '../domains/user/lib/user.findUser.service.js';
 import generateTokens from '../utils/generateTokens.js';
 import { findAndUpdateUser } from '../domains/user/lib/user.findAndUpdateUser.service.js';
-import { findSessionActivity } from '../domains/platform/lib/platform.findSessionActivity.service.js';
+import { findSessionActivity } from '../domains/platform/lib/sessionActivityManagement/platform.findSessionActivity.service.js';
 const authAndSessionsMiddleware = async (req, res, next) => {
     const requestHeaders = req.headers;
     const { email, authorization, sub_session_activity_id } = requestHeaders;

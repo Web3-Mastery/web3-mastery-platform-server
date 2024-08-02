@@ -1,5 +1,5 @@
-import { findPostCategory } from '../../lib/platform.findPostCategory.service.js';
-import { deletePostCategory } from '../../lib/platform.deletePostCategory.service.js';
+import { findPostCategory } from '../../lib/postCategoryManagement/platform.findPostCategory.service.js';
+import { deletePostCategory } from '../../lib/postCategoryManagement/platform.deletePostCategory.service.js';
 import { findUser } from '../../../user/lib/user.findUser.service.js';
 const deletePlatformPostCategory = async (req, res) => {
     if (req.user) {
@@ -22,19 +22,20 @@ const deletePlatformPostCategory = async (req, res) => {
                     responseMessage: `post-category with categoryId: '${_categoryId}' does not exist or has already been deleted`
                 });
             }
-            const deletedSessionActivity = await deletePostCategory({ categoryId: _categoryId });
-            if (deletedSessionActivity && deletedSessionActivity.acknowledged === true && newUserAccessToken && newUserRefreshToken) {
-                // update refresh token(cookie)
-                //   res.cookie('Web3Mastery_SecretRefreshToken', newUserRefreshToken, {
-                //     httpOnly: true,
-                //     secure: true,
-                //     sameSite: 'none', // Prevent CSRF attacks
-                //     maxAge: 24 * 60 * 60 * 1000 // 1 day
+            const deletedResponse = await deletePostCategory({ categoryId: _categoryId });
+            if (deletedResponse && deletedResponse.acknowledged === true && newUserAccessToken && newUserRefreshToken) {
+                //  update refresh token(cookie)
+                res.cookie('Web3Mastery_SecretRefreshToken', newUserRefreshToken, {
+                    httpOnly: true,
+                    secure: true,
+                    sameSite: 'none', // Prevent CSRF attacks
+                    maxAge: 24 * 60 * 60 * 1000 // 1 day
+                });
                 return res.status(201).json({
                     responseMessage: 'post-category deleted successfully',
                     response: {
+                        deleteResult: deletedResponse,
                         deletedPostCategory: existingPostCategory,
-                        deleteResult: deletedSessionActivity,
                         accessToken: newUserAccessToken,
                         sessionStatus
                     }

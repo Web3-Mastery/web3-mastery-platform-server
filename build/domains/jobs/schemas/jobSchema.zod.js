@@ -1,4 +1,5 @@
 import { z } from 'zod';
+import { objectIdSchema } from '../../../../globals.d.js';
 export const jobSchema = z.object({
     jobTitle: z.string({
         required_error: 'jobTitle is required',
@@ -27,6 +28,10 @@ export const jobSchema = z.object({
     jobDescription: z.string({
         required_error: 'jobDescription is required',
         invalid_type_error: 'jobDescription must be a string'
+    }),
+    jobCategory: z.string({
+        required_error: 'jobCategory is required',
+        invalid_type_error: 'jobCategory must be a string'
     }),
     requiredSkills: z.array(z.string(), {
         // required_error: 'requiredSkills are required',
@@ -63,9 +68,13 @@ export const jobSchema = z.object({
             required_error: 'authorImage is required',
             invalid_type_error: 'authorImage must be a string'
         }),
-        posterId: z.string({
-            required_error: 'posterId is required',
-            invalid_type_error: 'posterId must be a string'
-        })
+        posterId: objectIdSchema.optional()
+    }),
+    jobLink: z
+        .string({
+        // required_error: 'jobLink is required',
+        invalid_type_error: 'jobLink must be a string'
     })
+        .optional(),
+    _id: objectIdSchema.optional()
 });

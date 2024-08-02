@@ -5,7 +5,7 @@ import { findPreSignUpUser } from '../lib/user.findPreSignUpUser.service.js';
 import { createPreSignUpUser } from '../lib/auth.createPreSignUpUser.service.js';
 import { findAndUpdatePreSignUpUser } from '../lib/user.findAndUpdatePreSignUpUser.service.js';
 import { deletePreSignUpUser } from '../lib/user.deletePreSignUpUser.service.js';
-import { findSessionActivity } from '../../platform/lib/platform.findSessionActivity.service.js';
+import { findSessionActivity } from '../../platform/lib/sessionActivityManagement/platform.findSessionActivity.service.js';
 // type RequestHeaderContentSpecs = {
 //   authorization: string;
 //   email: string;

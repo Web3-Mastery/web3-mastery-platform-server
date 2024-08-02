@@ -1,4 +1,4 @@
-import { findPostCategory } from '../../lib/platform.findPostCategory.service.js';
+import { findPostCategory } from '../../lib/postCategoryManagement/platform.findPostCategory.service.js';
 import { findUser } from '../../../user/lib/user.findUser.service.js';
 const getPostCategory = async (req, res) => {
     if (req.user) {

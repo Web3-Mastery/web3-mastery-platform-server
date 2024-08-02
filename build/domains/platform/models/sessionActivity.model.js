@@ -24,6 +24,29 @@ const contentActivityDataSchema = new mongoose.Schema({
         required: [true, 'contentUrl is required']
     }
 });
+/* schema for user-based activity on jobs - e.g. creating jobs, bookmarking jobs, etc */
+const jobActivityDataSchema = new mongoose.Schema({
+    jobTitle: {
+        type: String,
+        trim: true,
+        required: [true, 'jobTitle is required']
+    },
+    jobCategory: {
+        type: String,
+        trim: true,
+        required: [true, 'jobType is required']
+    },
+    jobId: {
+        type: mongoose.Types.ObjectId,
+        ref: 'post',
+        unique: true
+    },
+    jobUrl: {
+        type: String,
+        trim: true,
+        required: [true, 'jobUrl is required']
+    }
+});
 // const userSchema = new Schema<UserDocument>(
 const sessionActivitySchema = new mongoose.Schema({
     activityName: {
@@ -43,6 +66,10 @@ const sessionActivitySchema = new mongoose.Schema({
     },
     contentActivityData: {
         type: contentActivityDataSchema,
+        required: false
+    },
+    jobActivityData: {
+        type: jobActivityDataSchema,
         required: false
     }
 }, {

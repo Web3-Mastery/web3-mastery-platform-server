@@ -1,5 +1,5 @@
-import { findPostCategory } from '../../lib/platform.findPostCategory.service.js';
-import { findAndUpdatePostCategory } from '../../lib/platform.findAndUpdatePostCategory.service.js';
+import { findPostCategory } from '../../lib/postCategoryManagement/platform.findPostCategory.service.js';
+import { findAndUpdatePostCategory } from '../../lib/postCategoryManagement/platform.findAndUpdatePostCategory.service.js';
 import { findUser } from '../../../user/lib/user.findUser.service.js';
 const updatePostCategory = async (req, res) => {
     if (req.user) {

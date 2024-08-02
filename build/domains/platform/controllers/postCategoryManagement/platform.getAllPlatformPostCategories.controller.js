@@ -1,4 +1,4 @@
-import { fetchAllPostCategories } from '../../lib/platform.fetchAllPostCategories.service.js';
+import { fetchAllPostCategories } from '../../lib/postCategoryManagement/platform.fetchAllPostCategories.service.js';
 import { findUser } from '../../../user/lib/user.findUser.service.js';
 // @ts-ignore
 const getAllPlatformPostCategories = async (req, res) => {

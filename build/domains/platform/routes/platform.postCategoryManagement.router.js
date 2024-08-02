@@ -8,8 +8,8 @@ import verifyAdminMiddleware from '../../../middlewares/verifyAdminMiddleware.js
 import verifyUserDataToControllerMiddleware from '../../../middlewares/verifyUserDataToControllerMiddleware.js';
 // end-points
 import createPostCategory from '../controllers/postCategoryManagement/platform.createPostCategory.controller.js';
-import deletePlatformPost from '../controllers/platformPostsManagement/platform.deletePost.controller.js';
-import updatePlatformPost from '../controllers/platformPostsManagement/platform.updatePost.controller.js';
+import deletePlatformPostCategory from '../controllers/postCategoryManagement/platform.deletePostCategory.controller.js';
+import updatePostCategory from '../controllers/postCategoryManagement/platform.updatePostCategory.controller.js';
 import getAllPlatformPostCategories from '../controllers/postCategoryManagement/platform.getAllPlatformPostCategories.controller.js';
 import getPostCategory from '../controllers/postCategoryManagement/platform.getPostCategory.controller.js';
 // express router init
@@ -26,11 +26,11 @@ router
     .get(authAndSessionsMiddleware, verifyAdminMiddleware, verifyUserDataToControllerMiddleware, getAllPlatformPostCategories);
 router
     .route('/delete-post-category/:categoryId')
-    .delete(authAndSessionsMiddleware, validateData({ params: paramsSchema }), verifyAdminMiddleware, verifyUserDataToControllerMiddleware, deletePlatformPost);
+    .delete(authAndSessionsMiddleware, validateData({ params: paramsSchema }), verifyAdminMiddleware, verifyUserDataToControllerMiddleware, deletePlatformPostCategory);
 router
     .route('/get-post-category/:categoryId')
     .get(authAndSessionsMiddleware, validateData({ params: paramsSchema }), verifyAdminMiddleware, verifyUserDataToControllerMiddleware, getPostCategory);
 router
     .route('/update-post-category/:categoryId')
-    .patch(authAndSessionsMiddleware, validateData({ body: sessionActivitySchema, params: paramsSchema }), verifyAdminMiddleware, verifyUserDataToControllerMiddleware, updatePlatformPost);
+    .patch(authAndSessionsMiddleware, validateData({ body: sessionActivitySchema, params: paramsSchema }), verifyAdminMiddleware, verifyUserDataToControllerMiddleware, updatePostCategory);
 export default router;

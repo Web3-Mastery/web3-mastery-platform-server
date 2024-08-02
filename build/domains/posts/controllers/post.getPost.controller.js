@@ -1,6 +1,6 @@
 import { findPost } from '../lib/post.findPost.service.js';
 import { findUser } from '../../user/lib/user.findUser.service.js';
-import { findSessionActivity } from '../../platform/lib/platform.findSessionActivity.service.js';
+import { findSessionActivity } from '../../platform/lib/sessionActivityManagement/platform.findSessionActivity.service.js';
 import { findAndUpdateUser } from '../../user/lib/user.findAndUpdateUser.service.js';
 const getPost = async (req, res) => {
     if (req.user) {

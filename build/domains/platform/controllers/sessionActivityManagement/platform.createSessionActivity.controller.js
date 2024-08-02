@@ -1,5 +1,5 @@
-import { findSessionActivity } from '../../lib/platform.findSessionActivity.service.js';
-import { createSessionActivity } from '../../lib/platform.createSessionActivity.service.js';
+import { findSessionActivity } from '../../lib/sessionActivityManagement/platform.findSessionActivity.service.js';
+import { createSessionActivity } from '../../lib/sessionActivityManagement/platform.createSessionActivity.service.js';
 import { findUser } from '../../../user/lib/user.findUser.service.js';
 const createSessionActivityController = async (req, res) => {
     if (req.user) {

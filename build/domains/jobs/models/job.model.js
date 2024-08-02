@@ -26,10 +26,15 @@ const jobSchema = new mongoose.Schema({
     },
     jobNatureAndLocation: {
         type: String,
-        required: [true, 'Job nature and location are required'],
+        required: [true, 'Nature of the job and job location are required'],
         trim: true
     },
     jobDescription: {
+        type: String,
+        required: [true, 'Job description is required'],
+        trim: true
+    },
+    jobCategory: {
         type: String,
         required: [true, 'Job description is required'],
         trim: true
@@ -70,6 +75,11 @@ const jobSchema = new mongoose.Schema({
             required: [true, 'Poster ID is required'],
             trim: true
         }
+    },
+    jobLink: {
+        type: String,
+        required: [true, 'jobLink required'],
+        trim: true
     }
 }, {
     timestamps: true

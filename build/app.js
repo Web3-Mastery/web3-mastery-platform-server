@@ -9,6 +9,7 @@ import authRouter from './domains/user/routes/auth.router.js';
 import userRouter from './domains/user/routes/user.router.js';
 import sessionActivityManagementRouter from './domains/platform/routes/platform.sessionActivityManagement.router.js';
 import postCategoryManagementRouter from './domains/platform/routes/platform.postCategoryManagement.router.js';
+import jobsCategoryManagementRouter from './domains/platform/routes/platform.jobCategoryManagement.router.js';
 import platformPostsManagementRouter from './domains/platform/routes/platform.platformPostsManagement.router.js';
 import platformPostsRouter from './domains/posts/routes/post.router.js';
 // dependency inits
@@ -58,6 +59,7 @@ app.use('/api/v1/posts', platformPostsRouter);
 app.use('/api/v1/platform/platform-posts-management', platformPostsManagementRouter);
 app.use('/api/v1/platform/session-activity-management', sessionActivityManagementRouter);
 app.use('/api/v1/platform/post-category-management', postCategoryManagementRouter);
+app.use('/api/v1/platform/job-category-management', jobsCategoryManagementRouter);
 const port = process.env.PORT || 5000;
 const start = async () => {
     const decodeDB_URI = process.env.DB_URI;

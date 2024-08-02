@@ -1,4 +1,4 @@
-import { fetchAllPlatformSessionActivities } from '../../lib/platform.fetchAllSessionActivities.service.js';
+import { fetchAllPlatformSessionActivities } from '../../lib/sessionActivityManagement/platform.fetchAllSessionActivities.service.js';
 import { findUser } from '../../../user/lib/user.findUser.service.js';
 // @ts-ignore
 const getAllPlatformSessionActivities = async (req, res) => {

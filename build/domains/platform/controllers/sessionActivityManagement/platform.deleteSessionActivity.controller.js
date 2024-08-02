@@ -1,5 +1,5 @@
-import { deleteSessionActivity } from '../../lib/platform.deleteSessionActivity.service.js';
-import { findSessionActivity } from '../../lib/platform.findSessionActivity.service.js';
+import { deleteSessionActivity } from '../../lib/sessionActivityManagement/platform.deleteSessionActivity.service.js';
+import { findSessionActivity } from '../../lib/sessionActivityManagement/platform.findSessionActivity.service.js';
 import { findUser } from '../../../user/lib/user.findUser.service.js';
 const deletePlatformSessionActivity = async (req, res) => {
     if (req.user) {

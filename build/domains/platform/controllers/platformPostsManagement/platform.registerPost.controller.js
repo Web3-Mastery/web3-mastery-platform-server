@@ -1,7 +1,7 @@
 import { findPost } from '../../../posts/lib/post.findPost.service.js';
-import { createPost } from '../../../posts/lib/post.createPost.service.js';
+import { createPost } from '../../lib/platformPostsManagement/post.createPost.service.js';
 import { findUser } from '../../../user/lib/user.findUser.service.js';
-import { findSessionActivity } from '../../lib/platform.findSessionActivity.service.js';
+import { findSessionActivity } from '../../lib/sessionActivityManagement/platform.findSessionActivity.service.js';
 import { findAndUpdateUser } from '../../../user/lib/user.findAndUpdateUser.service.js';
 const registerPost = async (req, res) => {
     const { postSlug } = req.body;

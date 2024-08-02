@@ -1,5 +1,5 @@
-import { findSessionActivity } from '../../lib/platform.findSessionActivity.service.js';
-import { findAndUpdateSessionActivity } from '../../lib/platform.findAndUpdateSessionActivity.service.js';
+import { findSessionActivity } from '../../lib/sessionActivityManagement/platform.findSessionActivity.service.js';
+import { findAndUpdateSessionActivity } from '../../lib/sessionActivityManagement/platform.findAndUpdateSessionActivity.service.js';
 import { findUser } from '../../../user/lib/user.findUser.service.js';
 const updateSessionActivityController = async (req, res) => {
     if (req.user) {
