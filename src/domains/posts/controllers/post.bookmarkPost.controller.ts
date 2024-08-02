@@ -2,7 +2,7 @@ import type { Request, Response } from 'express';
 import type { PostSpecs } from '../schemas/postSchema.zod.js';
 import { findPost } from '../lib/post.findPost.service.js';
 import { findUser } from '../../user/lib/user.findUser.service.js';
-import { findSessionActivity } from '../../platform/lib/platform.findSessionActivity.service.js';
+import { findSessionActivity } from '../../platform/lib/sessionActivityManagement/platform.findSessionActivity.service.js';
 import { findAndUpdateUser } from '../../user/lib/user.findAndUpdateUser.service.js';
 import { findAndUpdatePost } from '../lib/post.findAndUpdatePost.service.js';
 

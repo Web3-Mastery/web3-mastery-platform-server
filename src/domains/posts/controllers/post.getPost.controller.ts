@@ -2,7 +2,7 @@ import type { Request, Response } from 'express';
 import type { PostSpecs } from '../schemas/postSchema.zod.js';
 import { findPost } from '../lib/post.findPost.service.js';
 import { findUser } from '../../user/lib/user.findUser.service.js';
-import { findSessionActivity } from '../../platform/lib/platform.findSessionActivity.service.js';
+import { findSessionActivity } from '../../platform/lib/sessionActivityManagement/platform.findSessionActivity.service.js';
 import { findAndUpdateUser } from '../../user/lib/user.findAndUpdateUser.service.js';
 
 // description: gets a platform post and also registers relevant data about that post on on the user's sub-session
