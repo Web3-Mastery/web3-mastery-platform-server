@@ -5,7 +5,7 @@ import type { UserSpecs } from '../domains/user/schemas/userSchema.zod.js';
 import { findUser } from '../domains/user/lib/user.findUser.service.js';
 import generateTokens from '../utils/generateTokens.js';
 import { findAndUpdateUser } from '../domains/user/lib/user.findAndUpdateUser.service.js';
-import { findSessionActivity } from '../domains/platform/lib/platform.findSessionActivity.service.js';
+import { findSessionActivity } from '../domains/platform/lib/sessionActivityManagement/platform.findSessionActivity.service.js';
 import type { SessionActivitySpecs } from '../domains/platform/schemas/sessionActivity.schema.js';
 // import generateTokens from '../utils/generateTokens.js';
 

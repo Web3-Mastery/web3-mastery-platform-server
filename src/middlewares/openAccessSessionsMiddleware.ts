@@ -1,6 +1,6 @@
 // import { TokenExpiredError } from 'jsonwebtoken';
 import { type Request, type Response, type NextFunction } from 'express';
-import { findSessionActivity } from '../domains/platform/lib/platform.findSessionActivity.service.js';
+import { findSessionActivity } from '../domains/platform/lib/sessionActivityManagement/platform.findSessionActivity.service.js';
 import type { SessionActivitySpecs } from '../domains/platform/schemas/sessionActivity.schema.js';
 import { findPreSignUpUser } from '../domains/user/lib/user.findPreSignUpUser.service.js';
 import type { UserSpecs } from '../domains/user/schemas/userSchema.zod.js';

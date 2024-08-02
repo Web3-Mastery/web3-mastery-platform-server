@@ -7,7 +7,7 @@ import generateTokens from '../utils/generateTokens.js';
 import { findPreSignUpUser } from '../domains/user/lib/user.findPreSignUpUser.service.js';
 import { findAndUpdatePreSignUpUser } from '../domains/user/lib/user.findAndUpdatePreSignUpUser.service.js';
 // import generateTokens from '../utils/generateTokens.js';
-import { findSessionActivity } from '../domains/platform/lib/platform.findSessionActivity.service.js';
+import { findSessionActivity } from '../domains/platform/lib/sessionActivityManagement/platform.findSessionActivity.service.js';
 import type { SessionActivitySpecs } from '../domains/platform/schemas/sessionActivity.schema.js';
 
 type RequestHeaderContentSpecs = {
