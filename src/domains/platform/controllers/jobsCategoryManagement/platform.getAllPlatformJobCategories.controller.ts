@@ -1,26 +1,26 @@
 import type { Request, Response } from 'express';
-import type { PostCategorySpecs } from '../../schemas/postCategory.schema.js';
-import { fetchAllPostCategories } from '../../lib/postCategoryManagement/platform.fetchAllPostCategories.service.js';
+import type { JobCategorySpecs } from '../../schemas/jobCategory.schema.js';
+import { fetchAllJobCategories } from '../../lib/jobCategoryManagement/platform.fetchAllJobCategories.service.js';
 import { findUser } from '../../../user/lib/user.findUser.service.js';
 
-// description: get all platform-post categories, and send back relevant data as response.
+// description: get all platform-job categories, and send back relevant data as response.
 // request: GET
-// route: '/api/v1/platform/post-category-management/get-all-platform-post-categories";
+// route: '/api/v1/platform/job-category-management/get-all-platform-job-categories";
 // access: Private
 
 type ResponseSpecs = {
   error?: string;
   responseMessage: string;
   response?: {
-    platformPostCategoriesCount: number;
-    platformPostCategories: PostCategorySpecs[];
+    platformJobCategoriesCount: number;
+    platformJobCategories: JobCategorySpecs[];
     accessToken: string;
     sessionStatus: string;
   };
 };
 
 // @ts-ignore
-const getAllPlatformPostCategories = async (req: Request<{}, ResponseSpecs>, res: Response<ResponseSpecs>) => {
+const getAllPlatformJobCategories = async (req: Request<{}, ResponseSpecs>, res: Response<ResponseSpecs>) => {
   if (req.user) {
     const { userEmail, sessionStatus, newUserAccessToken, newUserRefreshToken } = req.user;
 
@@ -34,12 +34,12 @@ const getAllPlatformPostCategories = async (req: Request<{}, ResponseSpecs>, res
         });
       }
 
-      const platformPostCategories = await fetchAllPostCategories();
+      const platformJobCategories = await fetchAllJobCategories();
 
-      if (!platformPostCategories) {
+      if (!platformJobCategories) {
         return res.status(400).json({
           error: 'item not found',
-          responseMessage: `could not fetch platform post categories list: list not found of does not exist`
+          responseMessage: `could not fetch platform job categories list: list not found of does not exist`
         });
       }
 
@@ -51,7 +51,7 @@ const getAllPlatformPostCategories = async (req: Request<{}, ResponseSpecs>, res
       //   maxAge: 24 * 60 * 60 * 1000 // 1 day
       // });
 
-      if (platformPostCategories && newUserAccessToken && sessionStatus) {
+      if (platformJobCategories && newUserAccessToken && sessionStatus) {
         //  update refresh token(cookie)
         res.cookie('Web3Mastery_SecretRefreshToken', newUserRefreshToken, {
           httpOnly: true,
@@ -63,8 +63,8 @@ const getAllPlatformPostCategories = async (req: Request<{}, ResponseSpecs>, res
         return res.status(200).json({
           responseMessage: `user profile fetched successfully`,
           response: {
-            platformPostCategoriesCount: platformPostCategories.length,
-            platformPostCategories: platformPostCategories,
+            platformJobCategoriesCount: platformJobCategories.length,
+            platformJobCategories: platformJobCategories,
             accessToken: newUserAccessToken,
             sessionStatus: sessionStatus
           }
@@ -86,4 +86,4 @@ const getAllPlatformPostCategories = async (req: Request<{}, ResponseSpecs>, res
   }
 };
 
-export default getAllPlatformPostCategories;
+export default getAllPlatformJobCategories;

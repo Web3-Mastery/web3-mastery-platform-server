@@ -2,12 +2,12 @@ import type { Request, Response } from 'express';
 import type { DeleteResult } from 'mongodb';
 import type { PostSpecs } from '../../../posts/schemas/postSchema.zod.js';
 import { findPost } from '../../../posts/lib/post.findPost.service.js';
-import { deletePost } from '../../lib/post.deletePost.service.js';
+import { deletePost } from '../../lib/platformPostsManagement/post.deletePost.service.js';
 import { findUser } from '../../../user/lib/user.findUser.service.js';
-import { findSessionActivity } from '../../lib/platform.findSessionActivity.service.js';
+import { findSessionActivity } from '../../lib/sessionActivityManagement/platform.findSessionActivity.service.js';
 import { findAndUpdateUser } from '../../../user/lib/user.findAndUpdateUser.service.js';
 
-// description: deletes a new platform post/content(only article-based posts/content for now)
+// description: deletes a platform post/content(only article-based posts/content for now)
 // request: DELETE
 // route: '/api/v1/platform/platform-posts-management/delete-post'
 // access: Public
@@ -35,14 +35,7 @@ const deletePlatformPost = async (req: Request<{}, ResponseSpecs, PostSpecs>, re
       if (!user || user.isAdmin !== true) {
         return res.status(403).json({
           error: 'request rejected',
-          responseMessage: 'only platform administrators are allowed to perform this process'
-        });
-      }
-
-      if (!user || user.isAdmin !== true) {
-        return res.status(403).json({
-          error: 'request rejected',
-          responseMessage: 'only platform administrators are allowed to perform this process'
+          responseMessage: 'only platform administrators are allowed to perform this action'
         });
       }
 

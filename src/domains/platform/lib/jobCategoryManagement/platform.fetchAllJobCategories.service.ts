@@ -1,11 +1,11 @@
-import postCategoryModel from '../models/postCategory.model.js';
+import jobCategoryModel from '../../models/jobCategory.model.js';
 
-export async function fetchAllPostCategories() {
+export async function fetchAllJobCategories() {
   try {
-    const platformPostCategories = await postCategoryModel.find({});
+    const platformJobCategories = await jobCategoryModel.find({});
 
     // console.log(user);
-    return platformPostCategories;
+    return platformJobCategories;
   } catch (error) {
     if (error instanceof Error) {
       console.log(error.message);

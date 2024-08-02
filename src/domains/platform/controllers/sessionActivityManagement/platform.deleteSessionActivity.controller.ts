@@ -2,8 +2,8 @@ import type { Request, Response } from 'express';
 import type { DeleteResult } from 'mongodb';
 // import nodemailer from 'nodemailer';
 import type { SessionActivitySpecs } from '../../schemas/sessionActivity.schema.js';
-import { deleteSessionActivity } from '../../lib/platform.deleteSessionActivity.service.js';
-import { findSessionActivity } from '../../lib/platform.findSessionActivity.service.js';
+import { deleteSessionActivity } from '../../lib/sessionActivityManagement/platform.deleteSessionActivity.service.js';
+import { findSessionActivity } from '../../lib/sessionActivityManagement/platform.findSessionActivity.service.js';
 import { findUser } from '../../../user/lib/user.findUser.service.js';
 
 // description: deletes a platform session activity

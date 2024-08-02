@@ -1,22 +1,22 @@
-import postCategoryModel from '../models/postCategory.model.js';
+import jobCategoryModel from '../../models/jobCategory.model.js';
 
-export async function findPostCategory(categoryData: { categoryName?: string; categoryId?: string }) {
+export async function findJobCategory(categoryData: { categoryName?: string; categoryId?: string }) {
   try {
     const { categoryName, categoryId } = categoryData;
 
     if (categoryName) {
-      const newPostCategory = await postCategoryModel.findOne({
+      const newJobCategory = await jobCategoryModel.findOne({
         categoryName
       });
 
       // console.log(user);
-      return newPostCategory;
+      return newJobCategory;
     }
 
     if (categoryId) {
-      const newPostCategory = await postCategoryModel.findOne({ categoryId });
+      const newJobCategory = await jobCategoryModel.findOne({ categoryId });
 
-      return newPostCategory;
+      return newJobCategory;
     }
 
     return;

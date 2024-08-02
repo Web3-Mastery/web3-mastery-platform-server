@@ -1,9 +1,9 @@
 import type { Request, Response } from 'express';
 import type { PostSpecs } from '../../../posts/schemas/postSchema.zod.js';
 import { findPost } from '../../../posts/lib/post.findPost.service.js';
-import { createPost } from '../../../posts/lib/post.createPost.service.js';
+import { createPost } from '../../lib/platformPostsManagement/post.createPost.service.js';
 import { findUser } from '../../../user/lib/user.findUser.service.js';
-import { findSessionActivity } from '../../lib/platform.findSessionActivity.service.js';
+import { findSessionActivity } from '../../lib/sessionActivityManagement/platform.findSessionActivity.service.js';
 import { findAndUpdateUser } from '../../../user/lib/user.findAndUpdateUser.service.js';
 
 // description: creates a new platform post/content(only article-based posts/content for now)

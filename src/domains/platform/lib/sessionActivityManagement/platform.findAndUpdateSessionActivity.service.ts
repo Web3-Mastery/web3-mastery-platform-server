@@ -1,5 +1,5 @@
-import sessionActivityModel from '../models/sessionActivity.model.js';
-import type { SessionActivitySpecs } from '../schemas/sessionActivity.schema.js';
+import sessionActivityModel from '../../models/sessionActivity.model.js';
+import type { SessionActivitySpecs } from '../../schemas/sessionActivity.schema.js';
 
 export async function findAndUpdateSessionActivity(data: { activityId?: string; requestBody?: SessionActivitySpecs }) {
   try {

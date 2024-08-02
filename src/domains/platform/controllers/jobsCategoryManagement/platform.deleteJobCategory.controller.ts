@@ -1,14 +1,14 @@
 import type { Request, Response } from 'express';
 import type { DeleteResult } from 'mongodb';
 // import nodemailer from 'nodemailer';
-import type { PostCategorySpecs } from '../../schemas/postCategory.schema.js';
-import { findPostCategory } from '../../lib/postCategoryManagement/platform.findPostCategory.service.js';
-import { deletePostCategory } from '../../lib/postCategoryManagement/platform.deletePostCategory.service.js';
+import type { JobCategorySpecs } from '../../schemas/jobCategory.schema.js';
+import { findJobCategory } from '../../lib/jobCategoryManagement/platform.findJobCategory.service.js';
+import { deleteJobCategory } from '../../lib/jobCategoryManagement/platform.deleteJobCategory.service.js';
 import { findUser } from '../../../user/lib/user.findUser.service.js';
 
-// description: deletes a platform post-category
+// description: deletes a platform job-category
 // request: DELETE
-// route: '/api/v1/platform/post-category-management/delete-post-category/:categoryId'
+// route: '/api/v1/platform/job-category-management/delete-job-category/:categoryId'
 // access: Private
 
 type ResponseSpecs = {
@@ -16,17 +16,17 @@ type ResponseSpecs = {
   responseMessage: string;
   response?: {
     deleteResult: DeleteResult;
-    deletedPostCategory: PostCategorySpecs;
+    deletedJobCategory: JobCategorySpecs;
     accessToken: string;
     sessionStatus?: string;
   };
 };
 
-const deletePlatformPostCategory = async (req: Request<{}, ResponseSpecs, PostCategorySpecs>, res: Response<ResponseSpecs>) => {
+const deletePlatformjobCategory = async (req: Request<{}, ResponseSpecs, JobCategorySpecs>, res: Response<ResponseSpecs>) => {
   if (req.user) {
-    const { postCategoryId } = req.query;
+    const { jobCategoryId } = req.query;
 
-    const _categoryId = postCategoryId as string;
+    const _categoryId = jobCategoryId as string;
     try {
       const { userEmail, sessionStatus, newUserAccessToken, newUserRefreshToken } = req.user;
 
@@ -39,17 +39,17 @@ const deletePlatformPostCategory = async (req: Request<{}, ResponseSpecs, PostCa
         });
       }
 
-      const existingPostCategory = await findPostCategory({ categoryId: _categoryId });
+      const existingJobCategory = await findJobCategory({ categoryId: _categoryId });
       // console.log(existingSessionActivity);
 
-      if (!existingPostCategory) {
+      if (!existingJobCategory) {
         return res.status(400).json({
           error: 'process empty',
-          responseMessage: `post-category with categoryId: '${_categoryId}' does not exist or has already been deleted`
+          responseMessage: `job-category with categoryId: '${_categoryId}' does not exist or has already been deleted`
         });
       }
 
-      const deletedResponse = await deletePostCategory({ categoryId: _categoryId });
+      const deletedResponse = await deleteJobCategory({ categoryId: _categoryId });
 
       if (deletedResponse && deletedResponse.acknowledged === true && newUserAccessToken && newUserRefreshToken) {
         //  update refresh token(cookie)
@@ -61,10 +61,10 @@ const deletePlatformPostCategory = async (req: Request<{}, ResponseSpecs, PostCa
         });
 
         return res.status(201).json({
-          responseMessage: 'post-category deleted successfully',
+          responseMessage: 'job-category deleted successfully',
           response: {
             deleteResult: deletedResponse,
-            deletedPostCategory: existingPostCategory,
+            deletedJobCategory: existingJobCategory,
             accessToken: newUserAccessToken,
             sessionStatus
           }
@@ -94,4 +94,4 @@ const deletePlatformPostCategory = async (req: Request<{}, ResponseSpecs, PostCa
   return;
 };
 
-export default deletePlatformPostCategory;
+export default deletePlatformjobCategory;

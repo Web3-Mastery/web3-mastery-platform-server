@@ -1,4 +1,4 @@
-import sessionActivityModel from '../models/sessionActivity.model.js';
+import sessionActivityModel from '../../models/sessionActivity.model.js';
 export async function findSessionActivity(activityData: { activityName?: string; activityId?: string; activityDescription?: string; _id?: string }) {
   try {
     const { activityName, activityDescription, activityId, _id } = activityData;

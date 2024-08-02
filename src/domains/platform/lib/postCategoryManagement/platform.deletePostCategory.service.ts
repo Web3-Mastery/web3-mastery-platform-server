@@ -1,4 +1,4 @@
-import postCategoryModel from '../models/postCategory.model.js';
+import postCategoryModel from '../../models/postCategory.model.js';
 
 export async function deletePostCategory(data: { categoryId?: string }) {
   try {

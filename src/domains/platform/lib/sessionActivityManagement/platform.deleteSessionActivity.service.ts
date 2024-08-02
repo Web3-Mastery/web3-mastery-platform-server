@@ -1,4 +1,4 @@
-import sessionActivityModel from '../models/sessionActivity.model.js';
+import sessionActivityModel from '../../models/sessionActivity.model.js';
 
 export async function deleteSessionActivity(data: { activityId?: string }) {
   try {

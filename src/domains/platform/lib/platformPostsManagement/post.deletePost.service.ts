@@ -1,4 +1,4 @@
-import postModel from '../../posts/models/post.model.js';
+import postModel from '../../../posts/models/post.model.js';
 
 export async function deletePost(data: { postSlug?: string }) {
   try {

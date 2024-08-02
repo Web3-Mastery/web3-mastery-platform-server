@@ -1,5 +1,5 @@
-import postModel from '../../posts/models/post.model.js';
-import type { PostSpecs } from '../../posts/schemas/postSchema.zod.js';
+import postModel from '../../../posts/models/post.model.js';
+import type { PostSpecs } from '../../../posts/schemas/postSchema.zod.js';
 
 export async function findAndUpdatePost(data: { postSlug: string; requestBody: PostSpecs }) {
   try {

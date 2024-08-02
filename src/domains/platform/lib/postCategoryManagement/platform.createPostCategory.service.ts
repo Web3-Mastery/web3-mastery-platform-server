@@ -1,5 +1,5 @@
-import type { PostCategorySpecs } from '../schemas/postCategory.schema.js';
-import postCategoryModel from '../models/postCategory.model.js';
+import type { PostCategorySpecs } from '../../schemas/postCategory.schema.js';
+import postCategoryModel from '../../models/postCategory.model.js';
 
 export async function createPostCategory(data: { postCategoryData: PostCategorySpecs }) {
   const { postCategoryData } = data;

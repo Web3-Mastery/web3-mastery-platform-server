@@ -1,5 +1,5 @@
-import postCategoryModel from '../models/postCategory.model.js';
-import type { PostCategorySpecs } from '../schemas/postCategory.schema.js';
+import postCategoryModel from '../../models/postCategory.model.js';
+import type { PostCategorySpecs } from '../../schemas/postCategory.schema.js';
 
 export async function findAndUpdatePostCategory(data: { categoryId?: string; requestBody?: PostCategorySpecs }) {
   try {

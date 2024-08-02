@@ -33,6 +33,23 @@ export const sessionActivitySchema = z.object({
       })
     })
     .optional(),
+  jobActivityData: z
+    .object({
+      jobTitle: z.string({
+        required_error: 'jobTitle must be stated',
+        invalid_type_error: 'jobTitle must be a string'
+      }),
+      jobCategory: z.string({
+        required_error: 'jobCategory must be stated',
+        invalid_type_error: 'jobCategory must be a string'
+      }),
+      jobId: objectIdSchema,
+      jobUrl: z.string({
+        required_error: 'jobUrl must be stated',
+        invalid_type_error: 'jobUrl must be a string'
+      })
+    })
+    .optional(),
   _id: objectIdSchema.optional()
 });
 

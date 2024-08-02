@@ -1,27 +1,27 @@
 import type { Request, Response } from 'express';
-import type { PostCategorySpecs } from '../../schemas/postCategory.schema.js';
-import { findPostCategory } from '../../lib/postCategoryManagement/platform.findPostCategory.service.js';
-import { findAndUpdatePostCategory } from '../../lib/postCategoryManagement/platform.findAndUpdatePostCategory.service.js';
+import type { JobCategorySpecs } from '../../schemas/jobCategory.schema.js';
+import { findJobCategory } from '../../lib/jobCategoryManagement/platform.findJobCategory.service.js';
+import { findAndUpdateJobCategory } from '../../lib/jobCategoryManagement/platform.findAndUpdateJobCategory.service.js';
 import { findUser } from '../../../user/lib/user.findUser.service.js';
 
-// description: updates a new platform-post category data
+// description: updates a new platform-job category data
 // request: PATCH
-// route: '/api/v1/platform/post-category-management/update-post-category/:categoryId'
+// route: '/api/v1/platform/job-category-management/update-job-category/:categoryId'
 // access: Private(admin only)
 
 type ResponseSpecs = {
   error?: string;
   responseMessage: string;
   response?: {
-    updatedPostCategory: PostCategorySpecs;
+    updatedJobCategory: JobCategorySpecs;
     accessToken: string;
     sessionStatus?: string;
   };
 };
 
-const updatePostCategory = async (req: Request<{}, ResponseSpecs, PostCategorySpecs>, res: Response<ResponseSpecs>) => {
+const updateJobCategory = async (req: Request<{}, ResponseSpecs, JobCategorySpecs>, res: Response<ResponseSpecs>) => {
   if (req.user) {
-    const { categoryContentType, categoryId, categoryName } = req.body;
+    const { categoryId, categoryName } = req.body;
     const { userEmail, sessionStatus, newUserAccessToken, newUserRefreshToken } = req.user;
 
     try {
@@ -34,26 +34,26 @@ const updatePostCategory = async (req: Request<{}, ResponseSpecs, PostCategorySp
         });
       }
 
-      if (!categoryName || !categoryId || !categoryContentType) {
+      if (!categoryName || !categoryId) {
         return res.status(400).json({
-          error: 'required post-category data missing',
-          responseMessage: 'request unsuccessful: please provide all post-category data'
+          error: 'required job-category data missing',
+          responseMessage: 'request unsuccessful: please provide all job-category data'
         });
       }
       // console.log(email, name);
 
-      const existingPostCategory = await findPostCategory({ categoryId });
+      const existingJobCategory = await findJobCategory({ categoryId });
 
-      if (!existingPostCategory) {
+      if (!existingJobCategory) {
         return res.status(400).json({
           error: 'item not found',
-          responseMessage: `post-category with categoryId: '${categoryId}' not found or does not exist`
+          responseMessage: `job-category with categoryId: '${categoryId}' not found or does not exist`
         });
       }
 
-      const updatedPostCategory = await findAndUpdatePostCategory({ categoryId: categoryId, requestBody: req.body });
+      const updatedJobCategory = await findAndUpdateJobCategory({ categoryId: categoryId, requestBody: req.body });
 
-      if (updatedPostCategory && newUserAccessToken) {
+      if (updatedJobCategory && newUserAccessToken) {
         res.cookie('Web3Mastery_SecretRefreshToken', newUserRefreshToken, {
           httpOnly: true,
           secure: true,
@@ -64,7 +64,7 @@ const updatePostCategory = async (req: Request<{}, ResponseSpecs, PostCategorySp
         return res.status(200).json({
           responseMessage: 'session activity updated successfully',
           response: {
-            updatedPostCategory: updatedPostCategory,
+            updatedJobCategory: updatedJobCategory,
             accessToken: newUserAccessToken,
             sessionStatus
           }
@@ -93,4 +93,4 @@ const updatePostCategory = async (req: Request<{}, ResponseSpecs, PostCategorySp
   return;
 };
 
-export default updatePostCategory;
+export default updateJobCategory;

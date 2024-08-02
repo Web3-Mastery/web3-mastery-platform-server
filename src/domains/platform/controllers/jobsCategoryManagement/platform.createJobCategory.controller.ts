@@ -1,25 +1,25 @@
 import type { Request, Response } from 'express';
-import type { PostCategorySpecs } from '../../schemas/postCategory.schema.js';
-import { findPostCategory } from '../../lib/postCategoryManagement/platform.findPostCategory.service.js';
+import type { JobCategorySpecs } from '../../schemas/jobCategory.schema.js';
+import { findJobCategory } from '../../lib/jobCategoryManagement/platform.findJobCategory.service.js';
 import { findUser } from '../../../user/lib/user.findUser.service.js';
-import { createPostCategory } from '../../lib/postCategoryManagement/platform.createPostCategory.service.js';
+import { createJobCategory } from '../../lib/jobCategoryManagement/platform.createJobCategory.service.js';
 
-// description: creates a new platform post/content category
-// request: POST
-// route: '/api/v1/platform/post-category-management/create-post-category'
+// description: creates a new platform job/content category
+// request: job
+// route: '/api/v1/platform/job-category-management/create-job-category'
 // access: Private(admin only)
 
 type ResponseSpecs = {
   error?: string;
   responseMessage: string;
   response?: {
-    postCategory: PostCategorySpecs;
+    jobCategory: JobCategorySpecs;
     accessToken: string;
     sessionStatus?: string;
   };
 };
 
-const createPlatformPostCategory = async (req: Request<{}, ResponseSpecs, PostCategorySpecs>, res: Response<ResponseSpecs>) => {
+const createPlatformJobCategory = async (req: Request<{}, ResponseSpecs, JobCategorySpecs>, res: Response<ResponseSpecs>) => {
   if (req.user) {
     try {
       const { categoryId } = req.body;
@@ -34,18 +34,18 @@ const createPlatformPostCategory = async (req: Request<{}, ResponseSpecs, PostCa
         });
       }
 
-      const existingPostCategory = await findPostCategory({ categoryId });
+      const existingJobCategory = await findJobCategory({ categoryId });
 
-      if (existingPostCategory) {
+      if (existingJobCategory) {
         return res.status(400).json({
-          error: 'duplicate post category detected',
-          responseMessage: `request unsuccessful: a post category with categoryId: '${categoryId}' already exist`
+          error: 'duplicate job category detected',
+          responseMessage: `request unsuccessful: a job category with categoryId: '${categoryId}' already exist`
         });
       }
 
-      const newPostCategory = await createPostCategory({ postCategoryData: req.body });
+      const newJobCategory = await createJobCategory({ jobCategoryData: req.body });
 
-      if (newPostCategory && newUserAccessToken) {
+      if (newJobCategory && newUserAccessToken) {
         res.cookie('Web3Mastery_SecretRefreshToken', newUserRefreshToken, {
           httpOnly: true,
           secure: true,
@@ -54,9 +54,9 @@ const createPlatformPostCategory = async (req: Request<{}, ResponseSpecs, PostCa
         });
 
         return res.status(200).json({
-          responseMessage: 'post category created successfully',
+          responseMessage: 'job category created successfully',
           response: {
-            postCategory: newPostCategory,
+            jobCategory: newJobCategory,
             accessToken: newUserAccessToken,
             sessionStatus
           }
@@ -88,4 +88,4 @@ const createPlatformPostCategory = async (req: Request<{}, ResponseSpecs, PostCa
   return;
 };
 
-export default createPlatformPostCategory;
+export default createPlatformJobCategory;

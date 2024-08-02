@@ -9,11 +9,11 @@ import verifyAdminMiddleware from '../../../middlewares/verifyAdminMiddleware.js
 import verifyUserDataToControllerMiddleware from '../../../middlewares/verifyUserDataToControllerMiddleware.js';
 
 // end-points
-import createPostCategory from '../controllers/postCategoryManagement/platform.createPostCategory.controller.js';
-import deletePlatformPostCategory from '../controllers/postCategoryManagement/platform.deletePostCategory.controller.js';
-import updatePostCategory from '../controllers/postCategoryManagement/platform.updatePostCategory.controller.js';
-import getAllPlatformPostCategories from '../controllers/postCategoryManagement/platform.getAllPlatformPostCategories.controller.js';
-import getPostCategory from '../controllers/postCategoryManagement/platform.getPostCategory.controller.js';
+import createPlatformJobCategory from '../controllers/jobsCategoryManagement/platform.createJobCategory.controller.js';
+import updateJobCategory from '../controllers/jobsCategoryManagement/platform.updateJobCategory.controller.js';
+import deletePlatformJobCategory from '../controllers/jobsCategoryManagement/platform.deleteJobCategory.controller.js';
+import getJobCategory from '../controllers/jobsCategoryManagement/platform.getJobCategory.controller.js';
+import getAllPlatformJobCategories from '../controllers/jobsCategoryManagement/platform.getAllPlatformJobCategories.controller.js';
 
 // express router init
 const router = express.Router();
@@ -24,43 +24,43 @@ export const paramsSchema = z.object({
 
 // routes
 router
-  .route('/create-post-category')
+  .route('/create-job-category')
   .post(
     authAndSessionsMiddleware,
     validateData({ body: sessionActivitySchema }),
     verifyAdminMiddleware,
     verifyUserDataToControllerMiddleware,
-    createPostCategory
+    createPlatformJobCategory
   );
 router
-  .route('/get-all-platform-post-categories')
-  .get(authAndSessionsMiddleware, verifyAdminMiddleware, verifyUserDataToControllerMiddleware, getAllPlatformPostCategories);
+  .route('/get-all-platform-job-categories')
+  .get(authAndSessionsMiddleware, verifyAdminMiddleware, verifyUserDataToControllerMiddleware, getAllPlatformJobCategories);
 router
-  .route('/delete-post-category/:categoryId')
+  .route('/delete-job-category/:categoryId')
   .delete(
     authAndSessionsMiddleware,
     validateData({ params: paramsSchema }),
     verifyAdminMiddleware,
     verifyUserDataToControllerMiddleware,
-    deletePlatformPostCategory
+    deletePlatformJobCategory
   );
 router
-  .route('/get-post-category/:categoryId')
+  .route('/get-job-category/:categoryId')
   .get(
     authAndSessionsMiddleware,
     validateData({ params: paramsSchema }),
     verifyAdminMiddleware,
     verifyUserDataToControllerMiddleware,
-    getPostCategory
+    getJobCategory
   );
 router
-  .route('/update-post-category/:categoryId')
+  .route('/update-job-category/:categoryId')
   .patch(
     authAndSessionsMiddleware,
     validateData({ body: sessionActivitySchema, params: paramsSchema }),
     verifyAdminMiddleware,
     verifyUserDataToControllerMiddleware,
-    updatePostCategory
+    updateJobCategory
   );
 
 export default router;

@@ -1,6 +1,6 @@
 import type { Request, Response } from 'express';
 import type { SessionActivitySpecs } from '../../schemas/sessionActivity.schema.js';
-import { fetchAllPlatformSessionActivities } from '../../lib/platform.fetchAllSessionActivities.service.js';
+import { fetchAllPlatformSessionActivities } from '../../lib/sessionActivityManagement/platform.fetchAllSessionActivities.service.js';
 import { findUser } from '../../../user/lib/user.findUser.service.js';
 
 // description: get all platform session-activities, and send back relevant data as response.

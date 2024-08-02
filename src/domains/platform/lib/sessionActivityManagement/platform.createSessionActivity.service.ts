@@ -1,5 +1,5 @@
-import type { SessionActivitySpecs } from '../schemas/sessionActivity.schema.js';
-import sessionActivityModel from '../models/sessionActivity.model.js';
+import type { SessionActivitySpecs } from '../../schemas/sessionActivity.schema.js';
+import sessionActivityModel from '../../models/sessionActivity.model.js';
 
 export async function createSessionActivity(data: { sessionActivityData: SessionActivitySpecs }) {
   const { sessionActivityData } = data;

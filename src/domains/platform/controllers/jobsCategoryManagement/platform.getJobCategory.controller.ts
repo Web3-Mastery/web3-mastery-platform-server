@@ -1,24 +1,24 @@
 import type { Request, Response } from 'express';
-import type { PostCategorySpecs } from '../../schemas/postCategory.schema.js';
-import { findPostCategory } from '../../lib/postCategoryManagement/platform.findPostCategory.service.js';
+import type { JobCategorySpecs } from '../../schemas/jobCategory.schema.js';
+import { findJobCategory } from '../../lib/jobCategoryManagement/platform.findJobCategory.service.js';
 import { findUser } from '../../../user/lib/user.findUser.service.js';
 
 // description: get session activity, and send back relevant data as response.
 // request: GET
-// route: '/api/v1/platform/post-category-management/get-post-category/:categoryId";
+// route: '/api/v1/platform/job-category-management/get-job-category/:categoryId";
 // access: Private(admin-only)
 
 type ResponseSpecs = {
   error?: string;
   responseMessage: string;
   response?: {
-    postCategory: PostCategorySpecs;
+    jobCategory: JobCategorySpecs;
     accessToken: string;
     sessionStatus?: string;
   };
 };
 
-const getPostCategory = async (req: Request<{ categoryId: string }, ResponseSpecs>, res: Response<ResponseSpecs>) => {
+const getJobCategory = async (req: Request<{ categoryId: string }, ResponseSpecs>, res: Response<ResponseSpecs>) => {
   if (req.user) {
     try {
       const { categoryId } = req.params;
@@ -34,16 +34,16 @@ const getPostCategory = async (req: Request<{ categoryId: string }, ResponseSpec
         });
       }
 
-      const existingPostCategory = await findPostCategory({ categoryId });
+      const existingJobCategory = await findJobCategory({ categoryId });
 
-      if (!existingPostCategory) {
+      if (!existingJobCategory) {
         return res.status(400).json({
           error: 'item not found',
-          responseMessage: `post category with categoryId: '${categoryId}' not found or does not exist`
+          responseMessage: `job category with categoryId: '${categoryId}' not found or does not exist`
         });
       }
 
-      if (existingPostCategory && newUserAccessToken) {
+      if (existingJobCategory && newUserAccessToken) {
         // update refresh token(cookie)
         res.cookie('Web3Mastery_SecretRefreshToken', newUserRefreshToken, {
           httpOnly: true,
@@ -55,7 +55,7 @@ const getPostCategory = async (req: Request<{ categoryId: string }, ResponseSpec
         return res.status(200).json({
           responseMessage: `user profile fetched successfully`,
           response: {
-            postCategory: existingPostCategory,
+            jobCategory: existingJobCategory,
             accessToken: newUserAccessToken,
             sessionStatus
           }
@@ -81,4 +81,4 @@ const getPostCategory = async (req: Request<{ categoryId: string }, ResponseSpec
   return;
 };
 
-export default getPostCategory;
+export default getJobCategory;

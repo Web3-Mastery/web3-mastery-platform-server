@@ -2,11 +2,11 @@ import type { Request, Response } from 'express';
 import type { PostSpecs } from '../../../posts/schemas/postSchema.zod.js';
 import { findPost } from '../../../posts/lib/post.findPost.service.js';
 import { findUser } from '../../../user/lib/user.findUser.service.js';
-import { findAndUpdatePost } from '../../lib/post.findAndUpdatePost.service.js';
-import { findSessionActivity } from '../../lib/platform.findSessionActivity.service.js';
+import { findAndUpdatePost } from '../../lib/platformPostsManagement/post.findAndUpdatePost.service.js';
+import { findSessionActivity } from '../../lib/sessionActivityManagement/platform.findSessionActivity.service.js';
 import { findAndUpdateUser } from '../../../user/lib/user.findAndUpdateUser.service.js';
 
-// description: updates a new platform post/content(only article-based posts/content for now)
+// description: updates a platform post/content(only article-based posts/content for now)
 // request: PATCH
 // route: '/api/v1/platform/platform-posts-management/update-post'
 // access: Public
