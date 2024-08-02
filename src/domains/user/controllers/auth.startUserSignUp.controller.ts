@@ -7,7 +7,7 @@ import { createPreSignUpUser } from '../lib/auth.createPreSignUpUser.service.js'
 import type { UserSpecs } from '../schemas/userSchema.zod.js';
 import { findAndUpdatePreSignUpUser } from '../lib/user.findAndUpdatePreSignUpUser.service.js';
 import { deletePreSignUpUser } from '../lib/user.deletePreSignUpUser.service.js';
-import { findSessionActivity } from '../../platform/lib/platform.findSessionActivity.service.js';
+import { findSessionActivity } from '../../platform/lib/sessionActivityManagement/platform.findSessionActivity.service.js';
 import type { SessionActivitySpecs } from '../../platform/schemas/sessionActivity.schema.js';
 // import preSignUpUserModel from '../models/preSignUpUser.model.js';
 
