@@ -3,9 +3,9 @@ import type { PostSpecs } from '../schemas/postSchema.zod.js';
 import { findAllPosts } from '../lib/post.findAllPosts.service.js';
 // import { findUser } from '../../user/lib/user.findUser.service.js';
 
-// description: gets all platform posts/content.
+// description: gets all user's bookmarked posts...
 // request: GET
-// route: '/api/v1/posts/get-user-bookmarks/:userId";
+// route: '/api/v1/posts/get-user-posts-bookmarks/:userId";
 // access: Private | external
 
 type ResponseSpecs = {
@@ -23,7 +23,7 @@ type ResponseSpecs = {
   };
 };
 
-const getUserBookmarks = async (req: Request<{}, ResponseSpecs>, res: Response<ResponseSpecs>) => {
+const getUserPostsBookmarks = async (req: Request<{}, ResponseSpecs>, res: Response<ResponseSpecs>) => {
   if (req.user) {
     try {
       const { sessionStatus, userId, newUserAccessToken, newUserRefreshToken } = req.user;
@@ -31,9 +31,9 @@ const getUserBookmarks = async (req: Request<{}, ResponseSpecs>, res: Response<R
       const allPosts = await findAllPosts();
 
       // Filter posts bookmarked by the given user
-      const userBookmarks = allPosts.filter((post) => post.bookmarks.bookmarkedUsers.some((bookmark) => bookmark.userId.toString() === userId));
+      const userPostsBookmarks = allPosts.filter((post) => post.bookmarks.bookmarkedUsers.some((bookmark) => bookmark.userId.toString() === userId));
 
-      if (userBookmarks && newUserAccessToken && userId && newUserRefreshToken) {
+      if (userPostsBookmarks && newUserAccessToken && userId && newUserRefreshToken) {
         res.cookie('Web3Mastery_SecretRefreshToken', newUserRefreshToken, {
           httpOnly: true,
           secure: true,
@@ -44,8 +44,8 @@ const getUserBookmarks = async (req: Request<{}, ResponseSpecs>, res: Response<R
         return res.status(200).json({
           responseMessage: `user profile fetched successfully`,
           response: {
-            fetchedUserBookmarks: userBookmarks,
-            userBookmarksCount: String(userBookmarks.length),
+            fetchedUserBookmarks: userPostsBookmarks,
+            userBookmarksCount: String(userPostsBookmarks.length),
             accessToken: newUserAccessToken,
             sessionStatus: sessionStatus
           }
@@ -71,4 +71,4 @@ const getUserBookmarks = async (req: Request<{}, ResponseSpecs>, res: Response<R
   return;
 };
 
-export default getUserBookmarks;
+export default getUserPostsBookmarks;

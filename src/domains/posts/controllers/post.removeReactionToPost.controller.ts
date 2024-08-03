@@ -6,16 +6,17 @@ import { findSessionActivity } from '../../platform/lib/sessionActivityManagemen
 import { findAndUpdateUser } from '../../user/lib/user.findAndUpdateUser.service.js';
 import { findAndUpdatePost } from '../lib/post.findAndUpdatePost.service.js';
 
-// description: increases the post-reaction count and indicates(on the response) that the user has reacted to the post
+/* description: de-creases the post-reaction count and indicates(on the response) 
+that the user has removed their reaction from the post */
 // request: PATCH
-// route: '/api/v1/posts/react-to-post";
+// route: '/api/v1/posts/remove-reaction-to-post:postId";
 // access: Public
 
 type ResponseSpecs = {
   error?: string;
   responseMessage: string;
   response?: {
-    reactedPost: PostSpecs;
+    UN_reactedPost: PostSpecs;
     accessToken: string;
     extraData: {
       userHasReacted: boolean;
@@ -25,20 +26,20 @@ type ResponseSpecs = {
   };
 };
 
-const reactToPost = async (req: Request<{ postSlug: string }, ResponseSpecs>, res: Response<ResponseSpecs>) => {
+const reactToPost = async (req: Request<{ postId: string }, ResponseSpecs>, res: Response<ResponseSpecs>) => {
   if (req.user) {
     try {
-      const { postSlug } = req.params;
+      const { postId } = req.params;
       const { subSessionActivityId: activityId, sessionStatus, userEmail, userId, newUserAccessToken, newUserRefreshToken } = req.user;
 
-      const foundPost = await findPost({ postSlug });
+      const foundPost = await findPost({ postId });
 
       const user = await findUser({ email: userEmail });
 
       if (!foundPost) {
         return res.status(400).json({
           error: 'item not found',
-          responseMessage: `requested post with postSlug: '${postSlug}' not found or does not exist`
+          responseMessage: `requested post with postId: '${postId}' not found or does not exist`
         });
       }
 
@@ -49,18 +50,27 @@ const reactToPost = async (req: Request<{ postSlug: string }, ResponseSpecs>, re
         // increase postReactionCount
         const currentPostReactionCount = foundPost.reactions.reactionsCount;
 
-        const newCurrentPostReactionCount = Number(currentPostReactionCount) + 1;
+        const newCurrentPostReactionCount = Number(currentPostReactionCount) - 1;
 
-        // add reacting user to postReactionUsers list
-        const newReactedUsersArray = [...foundPost.reactions.reactedUsers, { userId: user._id }];
+        // remove user from post reaction list
+        const index = foundPost.reactions.reactedUsers?.indexOf({ userId: userId });
+
+        // check if the user exists in the array
+        if (index && index !== -1) {
+          // Remove the user using splice
+          foundPost.reactions.reactedUsers.splice(index, 1);
+        }
+
+        // add reacting user to postReactionUsers list => removal instead - done already
+        // const newReactedUsersArray = [...foundPost.reactions.reactedUsers, { userId: user._id }];
 
         const updatedPostData = await findAndUpdatePost({
-          postSlug: postSlug,
+          postId: postId,
           postData: {
             ...foundPost,
             reactions: {
               reactionsCount: newCurrentPostReactionCount.toString(),
-              reactedUsers: newReactedUsersArray
+              reactedUsers: foundPost.reactions.reactedUsers
             }
           }
         });
@@ -108,7 +118,7 @@ const reactToPost = async (req: Request<{ postSlug: string }, ResponseSpecs>, re
             });
 
             if (updatedPostData) {
-              // needless, since we just added the current user to that(reacted users list).
+              // needless since we just removed the user
               // const reactedUsers = updatedPostData.reactions.reactedUsers;
 
               // // check if user has liked this post
@@ -126,11 +136,11 @@ const reactToPost = async (req: Request<{ postSlug: string }, ResponseSpecs>, re
               return res.status(200).json({
                 responseMessage: `user profile fetched successfully`,
                 response: {
-                  reactedPost: updatedPostData,
+                  UN_reactedPost: updatedPostData,
                   accessToken: newUserAccessToken,
                   extraData: {
                     // userHasReacted: hasUserReacted ? true : false,
-                    userHasReacted: true, // straight-up true since we just added the user to the list
+                    userHasReacted: false,
                     userHasBookmarked: hasUserBookmarked ? true : false
                   },
                   sessionStatus: sessionStatus

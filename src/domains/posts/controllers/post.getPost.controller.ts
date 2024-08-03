@@ -7,7 +7,7 @@ import { findAndUpdateUser } from '../../user/lib/user.findAndUpdateUser.service
 
 // description: gets a platform post and also registers relevant data about that post on on the user's sub-session
 // request: GET
-// route: '/api/v1/posts/get-post";
+// route: '/api/v1/posts/get-post/:postId";
 // access: Public
 
 type ResponseSpecs = {
@@ -24,13 +24,13 @@ type ResponseSpecs = {
   };
 };
 
-const getPost = async (req: Request<{ postSlug: string }, ResponseSpecs>, res: Response<ResponseSpecs>) => {
+const getPost = async (req: Request<{ postId: string }, ResponseSpecs>, res: Response<ResponseSpecs>) => {
   if (req.user) {
     try {
-      const { postSlug } = req.params;
+      const { postId } = req.params;
       const { subSessionActivityId: activityId, sessionStatus, userEmail, userId, newUserAccessToken, newUserRefreshToken } = req.user;
 
-      const foundPost = await findPost({ postSlug });
+      const foundPost = await findPost({ postId });
 
       const user = await findUser({ email: userEmail });
 
@@ -44,7 +44,7 @@ const getPost = async (req: Request<{ postSlug: string }, ResponseSpecs>, res: R
       if (!foundPost) {
         return res.status(400).json({
           error: 'item not found',
-          responseMessage: `requested post with postSlug: '${postSlug}' not found or does not exist`
+          responseMessage: `requested post with postId: '${postId}' not found or does not exist`
         });
       }
 
@@ -78,13 +78,14 @@ const getPost = async (req: Request<{ postSlug: string }, ResponseSpecs>, res: R
           const currentSession = user.sessions[user.sessions.length - 1];
 
           if (currentSession) {
-            // const currentSubSession = currentSession[currentSession.length - 1];
+            const currentSubSession = currentSession[currentSession.length - 1];
 
             // const currentSessionId = currentSubSession?.sessionId;
 
             // const currentTimeInMilliseconds = Date.now();
 
             const newCurrentSubSessionObject = {
+              ...currentSubSession,
               // checkInTime: currentTimeInMilliseconds.toString(),
               subSessionActivity: currentUserSubSessionActivity
               // sessionId: currentSessionId // same id since they are on the same session

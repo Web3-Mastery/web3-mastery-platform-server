@@ -1,21 +1,21 @@
 import type { Request, Response } from 'express';
-import type { PostSpecs } from '../schemas/postSchema.zod.js';
-import { findPost } from '../lib/post.findPost.service.js';
 import { findUser } from '../../user/lib/user.findUser.service.js';
 import { findSessionActivity } from '../../platform/lib/sessionActivityManagement/platform.findSessionActivity.service.js';
 import { findAndUpdateUser } from '../../user/lib/user.findAndUpdateUser.service.js';
+import type { PostSpecs } from '../schemas/postSchema.zod.js';
+import { findPost } from '../lib/post.findPost.service.js';
 import { findAndUpdatePost } from '../lib/post.findAndUpdatePost.service.js';
 
-// description: increases the post-bookmark count and indicates(on the response) that the user has bookmarked the post
+// description: de-creases the post-bookmark count and indicates(on the response) that the user has UN-bookmarked the post.
 // request: PATCH
-// route: '/api/v1/posts/bookmark-post/:postId";
+// route: '/api/v1/posts/remove-post-bookmark:postId";
 // access: Public
 
 type ResponseSpecs = {
   error?: string;
   responseMessage: string;
   response?: {
-    bookmarkedPost: PostSpecs;
+    UN_bookmarkedPost: PostSpecs;
     accessToken: string;
     extraData: {
       userHasReacted: boolean;
@@ -25,17 +25,22 @@ type ResponseSpecs = {
   };
 };
 
-const bookmarkPost = async (req: Request<{ postId: string }, ResponseSpecs>, res: Response<ResponseSpecs>) => {
+const bookmarkJob = async (req: Request<{ postId: string }, ResponseSpecs>, res: Response<ResponseSpecs>) => {
   if (req.user) {
     try {
-      const { postId } = req.params;
-      const { subSessionActivityId: activityId, sessionStatus, userEmail, userId, newUserAccessToken, newUserRefreshToken } = req.user;
+      // const { postSlug } = req.query;
+      // const stringedPostSlug = postSlug as string;
 
-      const foundPost = await findPost({ postId });
+      const { postId } = req.params;
+
+      // const postSlug =
+      const { subSessionActivityId: activityId, sessionStatus, userEmail, userId, newUserAccessToken, newUserRefreshToken } = req.user;
 
       const user = await findUser({ email: userEmail });
 
-      if (!foundPost) {
+      const existingPost = await findPost({ postId: postId });
+
+      if (!existingPost) {
         return res.status(400).json({
           error: 'item not found',
           responseMessage: `requested post with postId: '${postId}' not found or does not exist`
@@ -45,28 +50,46 @@ const bookmarkPost = async (req: Request<{ postId: string }, ResponseSpecs>, res
       // get current user activity
       const currentUserSubSessionActivity = await findSessionActivity({ activityId });
 
-      if (foundPost && foundPost.postLink && user && currentUserSubSessionActivity && newUserAccessToken && userId && newUserRefreshToken) {
-        // increase postBookmarkCount
-        const currentPostBookmarkCount = foundPost.bookmarks.bookmarksCount;
+      if (existingPost && existingPost.postLink && user && currentUserSubSessionActivity && newUserAccessToken && userId && newUserRefreshToken) {
+        const currentNumberOfPostBookmarks = existingPost.bookmarks.bookmarksCount;
 
-        const newCurrentPostBookmarkCount = Number(currentPostBookmarkCount) + 1;
+        const newCurrentNumberOfPostBookmarks = Number(currentNumberOfPostBookmarks) - 1;
 
+        const postBookmarkedUsersArray = existingPost.bookmarks.bookmarkedUsers;
+
+        const index = postBookmarkedUsersArray.indexOf({ userId: userId });
+
+        // Check if the item exists in the array
+        if (index !== -1) {
+          // Remove the item using splice
+          postBookmarkedUsersArray.splice(index, 1);
+        }
+
+        // update job data
         // add bookmarking user to postBookmarkUsers list
-        const newBookmarkUsersArray = [...foundPost.bookmarks.bookmarkedUsers, { userId: user._id }];
+        // const newBookmarkUsersArray = [...existingJob.bookmarks.bookmarkedUsers, { userId: user._id }];
+        // I supposed this also works => // const newBookmarkUsersArray = existingJob.bookmarks.bookmarkedUsers.push(existingJob)
 
         const updatedPostData = await findAndUpdatePost({
           postId: postId,
           postData: {
-            ...foundPost,
+            ...existingPost,
             bookmarks: {
-              bookmarksCount: newCurrentPostBookmarkCount.toString(),
-              bookmarkedUsers: newBookmarkUsersArray
+              bookmarksCount: newCurrentNumberOfPostBookmarks.toString(),
+              bookmarkedUsers: postBookmarkedUsersArray
             }
           }
         });
 
-        // we're adding the user to the list just now, so the below commented section does not make complete sense
-        // const bookmarkedUsers = foundPost.bookmarks.bookmarkedUsers;
+        // const updatedUserData = await findAndUpdateUser({
+        //   email: userEmail,
+        //   requestBody: {
+        //     savedJobs: user.savedJobs
+        //   }
+        // });
+
+        // equally unnecessary as in the post case - cos we just added the user to the list as shown above
+        // const bookmarkedUsers = existingJob.bookmarks.bookmarkedUsers;
 
         // // check if user has bookmarked this post
         // const hasUserBookmarked = bookmarkedUsers?.find((each) => {
@@ -75,9 +98,9 @@ const bookmarkPost = async (req: Request<{ postId: string }, ResponseSpecs>, res
 
         currentUserSubSessionActivity.contentActivityData = {
           contentType: 'article',
-          contentTitle: foundPost.postTitle,
-          contentId: foundPost._id && foundPost._id,
-          contentUrl: foundPost.postLink
+          contentTitle: existingPost.postTitle,
+          contentId: existingPost._id && existingPost._id,
+          contentUrl: existingPost.postLink
         };
 
         if (user?.sessions && user?.sessions.length > 0) {
@@ -93,15 +116,21 @@ const bookmarkPost = async (req: Request<{ postId: string }, ResponseSpecs>, res
 
             const newCurrentSubSessionObject = {
               ...currentSubSession,
-              // checkInTime: currentTimeInMilliseconds.toString(),
+              //   checkInTime: currentTimeInMilliseconds.toString(),
               subSessionActivity: currentUserSubSessionActivity
               // sessionId: currentSessionId // same id since they are on the same session
             };
 
-            currentSession?.push(newCurrentSubSessionObject);
+            currentSession[currentSession?.length - 1] = newCurrentSubSessionObject;
 
-            // add existing job to user's bookmarked-posts list
-            user?.bookMarks?.push(foundPost);
+            // remove existing job from user's bookmarked-jobs list
+            const index = user?.bookMarks?.indexOf(existingPost);
+
+            // Check if the item exists in the array
+            if (index && index !== -1) {
+              // Remove the item using splice
+              user?.bookMarks?.splice(index, 1);
+            }
 
             await findAndUpdateUser({
               email: user.email,
@@ -114,10 +143,18 @@ const bookmarkPost = async (req: Request<{ postId: string }, ResponseSpecs>, res
 
             if (updatedPostData) {
               const reactedUsers = updatedPostData.reactions.reactedUsers;
+
               // check if user has liked this post
               const hasUserReacted = reactedUsers?.find((each) => {
                 return (each.userId = userId);
               });
+              // there is not reacting to jobs - but leave code for now - might need later
+              // const bookmarkedUsers = updatedPostData.reactions.reactedUsers;
+
+              // // check if user has liked this post
+              // const hasUserReacted = bookmarkedUsers?.find((each) => {
+              //   return (each.userId = userId);
+              // });
 
               res.cookie('Web3Mastery_SecretRefreshToken', newUserRefreshToken, {
                 httpOnly: true,
@@ -129,12 +166,12 @@ const bookmarkPost = async (req: Request<{ postId: string }, ResponseSpecs>, res
               return res.status(200).json({
                 responseMessage: `user profile fetched successfully`,
                 response: {
-                  bookmarkedPost: updatedPostData,
+                  UN_bookmarkedPost: updatedPostData,
                   accessToken: newUserAccessToken,
                   extraData: {
                     userHasReacted: hasUserReacted ? true : false,
-                    userHasBookmarked: true // automatically true because we just added the user to the bookmark list
-                    // userHasBookmarked: hasUserBookmarked ? true : false
+                    userHasBookmarked: false
+                    // userHasBookmarked: hasUserBookmarked ? true : false // straight-up true cos we just added the user as seen above
                   },
                   sessionStatus: sessionStatus
                 }
@@ -167,4 +204,4 @@ const bookmarkPost = async (req: Request<{ postId: string }, ResponseSpecs>, res
   return;
 };
 
-export default bookmarkPost;
+export default bookmarkJob;

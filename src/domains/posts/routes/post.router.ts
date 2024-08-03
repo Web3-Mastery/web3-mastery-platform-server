@@ -3,8 +3,8 @@ import express from 'express';
 import getPost from '../controllers/post.getPost.controller.js';
 import getAllPost from '../controllers/post.getAllPost.controller.js';
 import bookmarkPost from '../controllers/post.bookmarkPost.controller.js';
-import reactToPost from '../controllers/post.reactToPost.controller.js';
-import getUserBookmarks from '../controllers/post.getUserBookmarks.controller.js';
+import reactToPost from '../controllers/post.removeReactionToPost.controller.js';
+import getUserPostsBookmarks from '../controllers/post.getUserPostsBookmarks.controller.js';
 import authAndSessionMiddleware from '../../../middlewares/authAndSessionMiddleware.js';
 
 // import { ObjectId } from 'mongodb';
@@ -36,6 +36,6 @@ router.route('/get-post/:postSlug').get(authAndSessionMiddleware, getPost);
 router.route('/get-all-posts').get(authAndSessionMiddleware, getAllPost);
 router.route('/react-to-post/:postSlug').patch(authAndSessionMiddleware, reactToPost);
 router.route('/bookmark-post/:postSlug').patch(authAndSessionMiddleware, bookmarkPost);
-router.route('/get-user-bookmarks').get(authAndSessionMiddleware, getUserBookmarks);
+router.route('/get-user-bookmarks').get(authAndSessionMiddleware, getUserPostsBookmarks);
 
 export default router;
