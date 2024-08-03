@@ -8,7 +8,7 @@ import type { JobSpecs } from '../schemas/jobSchema.zod.js';
 
 // description: updates job and sends back relevant data as response
 // request: PATCH
-// route: '/api/v1/jobs/update-job'
+// route: '/api/v1/jobs/update-job/:jobId'
 // access: Public
 
 type ResponseSpecs = {
@@ -21,7 +21,7 @@ type ResponseSpecs = {
   };
 };
 
-const updatePlatformPost = async (req: Request<{ jobId: string }, ResponseSpecs, JobSpecs>, res: Response<ResponseSpecs>) => {
+const updatePlatformJob = async (req: Request<{ jobId: string }, ResponseSpecs, JobSpecs>, res: Response<ResponseSpecs>) => {
   if (req.user) {
     const { jobId } = req.params;
 
@@ -55,19 +55,20 @@ const updatePlatformPost = async (req: Request<{ jobId: string }, ResponseSpecs,
         const currentSession = user.sessions[user.sessions.length - 1];
 
         if (currentSession) {
-          // const currentSubSession = currentSession[currentSession.length - 1];
+          const currentSubSession = currentSession[currentSession.length - 1];
 
           // const currentSessionId = currentSubSession?.sessionId;
 
           // const currentTimeInMilliseconds = Date.now();
 
           const newCurrentSubSessionObject = {
-            // checkInTime: currentTimeInMilliseconds.toString(),
+            ...currentSubSession,
+            //   checkInTime: currentTimeInMilliseconds.toString(),
             subSessionActivity: currentUserSubSessionActivity
             // sessionId: currentSessionId // same id since they are on the same session
           };
 
-          currentSession?.push(newCurrentSubSessionObject);
+          currentSession[currentSession?.length - 1] = newCurrentSubSessionObject;
 
           await findAndUpdateUser({
             email: user.email,
@@ -122,4 +123,4 @@ const updatePlatformPost = async (req: Request<{ jobId: string }, ResponseSpecs,
   return;
 };
 
-export default updatePlatformPost;
+export default updatePlatformJob;

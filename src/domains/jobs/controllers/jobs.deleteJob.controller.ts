@@ -7,7 +7,7 @@ import { findUser } from '../../user/lib/user.findUser.service.js';
 import { findSessionActivity } from '../../platform/lib/sessionActivityManagement/platform.findSessionActivity.service.js';
 import { findAndUpdateUser } from '../../user/lib/user.findAndUpdateUser.service.js';
 
-// description: deletes a job
+// description: deletes a job and sends back relevant data as response
 // request: DELETE
 // route: '/api/v1/jobs/delete-job'
 // access: Public
@@ -65,19 +65,20 @@ const deletePlatformJob = async (req: Request<{ jobId: string }, ResponseSpecs, 
         const currentSession = user.sessions[user.sessions.length - 1];
 
         if (currentSession) {
-          // const currentSubSession = currentSession[currentSession.length - 1];
+          const currentSubSession = currentSession[currentSession.length - 1];
 
           // const currentSessionId = currentSubSession?.sessionId;
 
           // const currentTimeInMilliseconds = Date.now();
 
           const newCurrentSubSessionObject = {
-            // checkInTime: currentTimeInMilliseconds.toString(),
+            ...currentSubSession,
+            //   checkInTime: currentTimeInMilliseconds.toString(),
             subSessionActivity: currentUserSubSessionActivity
             // sessionId: currentSessionId // same id since they are on the same session
           };
 
-          currentSession?.push(newCurrentSubSessionObject);
+          currentSession[currentSession?.length - 1] = newCurrentSubSessionObject;
 
           await findAndUpdateUser({
             email: user.email,

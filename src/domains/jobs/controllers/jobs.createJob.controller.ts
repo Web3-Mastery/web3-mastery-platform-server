@@ -6,7 +6,7 @@ import { findUser } from '../../user/lib/user.findUser.service.js';
 import { findSessionActivity } from '../../platform/lib/sessionActivityManagement/platform.findSessionActivity.service.js';
 import { findAndUpdateUser } from '../../user/lib/user.findAndUpdateUser.service.js';
 
-// description: creates a new job
+// description: creates a new job and sends back relevant data as response
 // request: job
 // route: '/api/v1/jobs/register-job'
 // access: Public
@@ -28,7 +28,12 @@ const registerJob = async (req: Request<{}, ResponseSpecs, JobSpecs>, res: Respo
 
       const user = await findUser({ email: userEmail });
 
-      const registeredJob = await createJob({ jobData: req.body });
+      const registeredJob = await createJob({
+        jobData: {
+          ...req.body, // set existingJob link - code will break if it's not set - see the "if" conditions below
+          jobLink: `create a link for the job - getting the base platform URL(and prolly the jobs path as well) from .env`
+        }
+      });
 
       // get current user activity
       const currentUserSubSessionActivity = await findSessionActivity({ activityId });
@@ -51,24 +56,26 @@ const registerJob = async (req: Request<{}, ResponseSpecs, JobSpecs>, res: Respo
         const currentSession = user.sessions[user.sessions.length - 1];
 
         if (currentSession) {
-          // const currentSubSession = currentSession[currentSession.length - 1];
+          const currentSubSession = currentSession[currentSession.length - 1];
 
           // const currentSessionId = currentSubSession?.sessionId;
 
           // const currentTimeInMilliseconds = Date.now();
 
           const newCurrentSubSessionObject = {
-            // checkInTime: currentTimeInMilliseconds.toString(),
+            ...currentSubSession,
+            //   checkInTime: currentTimeInMilliseconds.toString(),
             subSessionActivity: currentUserSubSessionActivity
             // sessionId: currentSessionId // same id since they are on the same session
           };
 
-          currentSession?.push(newCurrentSubSessionObject);
+          currentSession[currentSession?.length - 1] = newCurrentSubSessionObject;
 
           await findAndUpdateUser({
             email: user.email,
             requestBody: {
-              sessions: user.sessions
+              sessions: user.sessions,
+              isRecruiterEnabled: true
               // accessToken: newUserAccessToken
             }
           });
