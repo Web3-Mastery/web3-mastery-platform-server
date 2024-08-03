@@ -114,6 +114,7 @@ const startUserSignUp = async (req: Request<{}, ResponseSpecs, inSpecs>, res: Re
     // generate signup link
     const signUpToken = await generateTokens({ tokenType: 'preSignUpToken', user: { name, email } });
 
+    // check and remove(if correct) since this below is already being set in the open-access middleware
     const subSessionActivity = (await findSessionActivity({ activityId: sub_session_activity_id })) as SessionActivitySpecs;
     // console.log(subSessionActivity);
 
@@ -133,6 +134,7 @@ const startUserSignUp = async (req: Request<{}, ResponseSpecs, inSpecs>, res: Re
     if (newPreSignUpUser) {
       const { email, signUpStatus, secretSignUpToken, sessions } = newPreSignUpUser;
 
+      // we needed to get the user with id first before we could generate the tokens(as done above) hence re-updating the user as below
       const preSignUpUserWithAccessToken = await findAndUpdatePreSignUpUser({
         email: newPreSignUpUser.email,
         requestBody: { name: newPreSignUpUser.name, email, signUpStatus, secretSignUpToken, sessions, accessToken }

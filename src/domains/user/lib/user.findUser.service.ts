@@ -1,8 +1,8 @@
 import userModel from '../models/user.model.js';
 
-export async function findUser(userData: { email?: string; id?: string }) {
+export async function findUser(userData: { email?: string; id?: string; walletAddress?: string }) {
   try {
-    const { email, id } = userData;
+    const { email, id, walletAddress } = userData;
 
     if (email) {
       const user = await userModel.findOne({
@@ -15,6 +15,12 @@ export async function findUser(userData: { email?: string; id?: string }) {
 
     if (id) {
       const user = await userModel.findOne({ _id: id });
+
+      return user;
+    }
+
+    if (walletAddress) {
+      const user = await userModel.findOne({ walletAddress });
 
       return user;
     }

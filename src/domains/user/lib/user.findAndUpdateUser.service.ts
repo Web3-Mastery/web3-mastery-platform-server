@@ -1,9 +1,9 @@
 import userModel from '../models/user.model.js';
 import type { UserSpecs } from '../schemas/userSchema.zod.js';
 
-export async function findAndUpdateUser(data: { email?: string; id?: string; requestBody?: UserSpecs }) {
+export async function findAndUpdateUser(data: { email?: string; id?: string; walletAddress?: string; requestBody?: UserSpecs }) {
   try {
-    const { email, id, requestBody } = data;
+    const { email, id, requestBody, walletAddress } = data;
 
     if (email) {
       const user = await userModel.findOneAndUpdate(
@@ -23,6 +23,15 @@ export async function findAndUpdateUser(data: { email?: string; id?: string; req
 
     if (id) {
       const user = await userModel.findOneAndUpdate({ _id: id }, requestBody, {
+        new: true,
+        runValidators: true
+      });
+
+      return user;
+    }
+
+    if (walletAddress) {
+      const user = await userModel.findOneAndUpdate({ walletAddress }, requestBody, {
         new: true,
         runValidators: true
       });

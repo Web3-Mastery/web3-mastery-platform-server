@@ -82,7 +82,15 @@ const userSchema = new mongoose.Schema<UserSpecs>(
       type: Boolean
       // required: [true, 'isAdmin is required']
     },
+    signedUpWithWallet: {
+      type: Boolean
+      // required: [true, 'signedUpWithWallet is required']
+    },
     isCommunityMember: {
+      type: Boolean
+      // required: [true, 'isAdmin is required']
+    },
+    isNewsletterSubscriber: {
       type: Boolean
       // required: [true, 'isAdmin is required']
     },
@@ -180,6 +188,7 @@ const userSchema = new mongoose.Schema<UserSpecs>(
     ],
     sessions: [
       [
+        // a session array containing sub-session objects
         {
           userIPAddress: {
             type: String,
@@ -199,16 +208,16 @@ const userSchema = new mongoose.Schema<UserSpecs>(
           ],
           subSessionActivity: {
             activityName: {
-              type: String,
-              required: true
+              type: String
+              // required: true
             },
             activityDescription: {
-              type: String,
-              required: true
+              type: String
+              // required: true
             },
             activityId: {
-              type: String,
-              required: true
+              type: String
+              // required: true
             }
 
             //   validate: {
