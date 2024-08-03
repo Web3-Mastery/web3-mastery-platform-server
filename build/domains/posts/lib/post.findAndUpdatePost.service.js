@@ -1,11 +1,22 @@
 import postModel from '../models/post.model.js';
 export async function findAndUpdatePost(data) {
+    const { postData, postId, postSlug } = data;
     try {
-        const updatedPost = await postModel.findOneAndUpdate({ postSlug: data.postSlug }, data.postData, {
-            new: true,
-            runValidators: true
-        });
-        return updatedPost;
+        if (postSlug) {
+            const updatedPost = await postModel.findOneAndUpdate({ postSlug: postSlug }, postData, {
+                new: true,
+                runValidators: true
+            });
+            return updatedPost;
+        }
+        if (postId) {
+            const updatedPost = await postModel.findOneAndUpdate({ _id: postId }, postData, {
+                new: true,
+                runValidators: true
+            });
+            return updatedPost;
+        }
+        return;
     }
     catch (error) {
         if (error instanceof Error) {

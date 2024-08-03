@@ -1,13 +1,13 @@
-import { findPost } from '../lib/post.findPost.service.js';
 import { findUser } from '../../user/lib/user.findUser.service.js';
 import { findSessionActivity } from '../../platform/lib/sessionActivityManagement/platform.findSessionActivity.service.js';
 import { findAndUpdateUser } from '../../user/lib/user.findAndUpdateUser.service.js';
-const getPost = async (req, res) => {
+import { findJob } from '../lib/jobs.findJob.service.js';
+const getJob = async (req, res) => {
     if (req.user) {
         try {
-            const { postId } = req.params;
+            const { jobId } = req.params;
             const { subSessionActivityId: activityId, sessionStatus, userEmail, userId, newUserAccessToken, newUserRefreshToken } = req.user;
-            const foundPost = await findPost({ postId });
+            const existingJob = await findJob({ jobId });
             const user = await findUser({ email: userEmail });
             // if (!user) {
             //   return res.status(403).json({
@@ -15,30 +15,30 @@ const getPost = async (req, res) => {
             //     responseMessage: `user with id: '${userId}' not found or does not exist`
             //   });
             // }
-            if (!foundPost) {
+            if (!existingJob) {
                 return res.status(400).json({
                     error: 'item not found',
-                    responseMessage: `requested post with postId: '${postId}' not found or does not exist`
+                    responseMessage: `requested job with jobId: '${jobId}' not found or does not exist`
                 });
             }
             // get current user activity
             const currentUserSubSessionActivity = await findSessionActivity({ activityId });
-            const reactedUsers = foundPost.reactions.reactedUsers;
-            const bookmarkedUsers = foundPost.bookmarks.bookmarkedUsers;
+            //   const reactedUsers = foundPost.reactions.reactedUsers;
+            const bookmarkedUsers = existingJob.bookmarks.bookmarkedUsers;
             if (currentUserSubSessionActivity && newUserAccessToken && userId && newUserRefreshToken) {
-                // check if user has liked this post
-                const hasUserReacted = reactedUsers?.find((each) => {
-                    return (each.userId = userId);
-                });
+                // check if user has liked this post => no reaction on jobs
+                // const hasUserReacted = reactedUsers?.find((each) => {
+                //   return (each.userId = userId);
+                // });
                 // check if user has bookmarked this post
                 const hasUserBookmarked = bookmarkedUsers?.find((each) => {
                     return (each.userId = userId);
                 });
-                currentUserSubSessionActivity.contentActivityData = {
-                    contentType: 'article',
-                    contentTitle: foundPost.postTitle,
-                    contentId: foundPost._id && foundPost._id,
-                    contentUrl: foundPost.postLink
+                currentUserSubSessionActivity.jobActivityData = {
+                    jobTitle: existingJob.jobTitle,
+                    jobCategory: existingJob.jobCategory,
+                    jobId: existingJob._id && existingJob._id,
+                    jobUrl: existingJob.jobLink
                 };
                 if (user?.sessions && user?.sessions.length > 0) {
                     // console.log(user.sessions);
@@ -49,11 +49,11 @@ const getPost = async (req, res) => {
                         // const currentTimeInMilliseconds = Date.now();
                         const newCurrentSubSessionObject = {
                             ...currentSubSession,
-                            // checkInTime: currentTimeInMilliseconds.toString(),
+                            //   checkInTime: currentTimeInMilliseconds.toString(),
                             subSessionActivity: currentUserSubSessionActivity
                             // sessionId: currentSessionId // same id since they are on the same session
                         };
-                        currentSession?.push(newCurrentSubSessionObject);
+                        currentSession[currentSession?.length - 1] = newCurrentSubSessionObject;
                         await findAndUpdateUser({
                             email: user.email,
                             requestBody: {
@@ -70,10 +70,10 @@ const getPost = async (req, res) => {
                         return res.status(200).json({
                             responseMessage: `user profile fetched successfully`,
                             response: {
-                                fetchedPost: foundPost,
+                                fetchedJob: existingJob,
                                 accessToken: newUserAccessToken,
                                 extraData: {
-                                    userHasReacted: hasUserReacted ? true : false,
+                                    //   userHasReacted: hasUserReacted ? true : false,
                                     userHasBookmarked: hasUserBookmarked ? true : false
                                 },
                                 sessionStatus: sessionStatus
@@ -103,4 +103,4 @@ const getPost = async (req, res) => {
     }
     return;
 };
-export default getPost;
+export default getJob;

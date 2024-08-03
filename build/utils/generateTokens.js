@@ -18,7 +18,31 @@ async function generateTokens(data) {
         const preSignUpToken = hashingHandler({ stringToHash: tokenDraft });
         return preSignUpToken;
     }
-    if (user) {
+    if (tokenType == 'newsletterToken' && user) {
+        const decoyCode = process.env.JWT_SECRET;
+        const tokenDraft = `${user.email}_${decoyCode}`;
+        const newsletterToken = hashingHandler({ stringToHash: tokenDraft });
+        return newsletterToken;
+    }
+    if (user && user.signedUpWithWallet == true) {
+        if (!user?._id || !user?.walletAddress) {
+            throw new Error('jwt token generation error: the provided user does not contain an id or walletAddress or both, please provide both');
+        }
+        const accessToken = jwt.sign({ userId: user._id, userEmail: user.walletAddress }, jwtSecret, { expiresIn: process.env.JWT_LIFETIME });
+        const salt = await bcrypt.genSalt(14);
+        const addressForTokenAGeneration = user.walletAddress;
+        const refreshTokenPartA = await bcrypt.hash(addressForTokenAGeneration, salt);
+        const refreshTokenPartB = process.env.JWT_SECRET;
+        const refreshToken = `Web3Mastery_SecretRefreshToken_${refreshTokenPartA}_${refreshTokenPartB}`;
+        // console.log(refreshToken);
+        const tokens = {
+            accessToken,
+            refreshToken
+        };
+        return tokens;
+    }
+    // if only user is provided, this generates both a jwt(access) token, and a custom refresh token.
+    if (user && user.signedUpWithWallet !== true) {
         if (!user?._id || !user?.email) {
             throw new Error('jwt token generation error: the provided user does not contain an id or email, please provide both');
         }

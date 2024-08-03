@@ -1,34 +1,31 @@
-// import { findJob } from '../lib/jobs.findJob.service.js';
-import { createJob } from '../lib/job.createJob.service.js';
+import { findJob } from '../lib/jobs.findJob.service.js';
+import { findAndUpdateJob } from '../lib/job.findAndUpdateJob.service.js';
 import { findUser } from '../../user/lib/user.findUser.service.js';
 import { findSessionActivity } from '../../platform/lib/sessionActivityManagement/platform.findSessionActivity.service.js';
 import { findAndUpdateUser } from '../../user/lib/user.findAndUpdateUser.service.js';
-const registerJob = async (req, res) => {
+const updatePlatformJob = async (req, res) => {
     if (req.user) {
+        const { jobId } = req.params;
         try {
             const { userEmail, sessionStatus, newUserAccessToken, newUserRefreshToken, subSessionActivityId: activityId } = req.user;
             const user = await findUser({ email: userEmail });
-            const registeredJob = await createJob({
-                jobData: {
-                    ...req.body, // set existingJob link - code will break if it's not set - see the "if" conditions below
-                    jobLink: `create a link for the job - getting the base platform URL(and prolly the jobs path as well) from .env`
-                }
-            });
+            const existingJob = await findJob({ jobId });
+            if (!existingJob) {
+                return res.status(400).json({
+                    error: 'process empty',
+                    responseMessage: `platform post with postSlug: '${jobId} does not exist or has already been deleted`
+                });
+            }
+            const updatedJob = await findAndUpdateJob({ jobId: jobId, requestBody: req.body });
             // get current user activity
             const currentUserSubSessionActivity = await findSessionActivity({ activityId });
-            if (user?.sessions &&
-                user?.sessions.length > 0 &&
-                registeredJob &&
-                registeredJob.jobLink &&
-                newUserAccessToken &&
-                currentUserSubSessionActivity) {
+            if (user?.sessions && user?.sessions.length > 0 && updatedJob && updatedJob.jobLink && newUserAccessToken && currentUserSubSessionActivity) {
                 currentUserSubSessionActivity.jobActivityData = {
-                    jobTitle: registeredJob.jobTitle,
-                    jobCategory: registeredJob.jobDescription,
-                    jobId: registeredJob?._id,
-                    jobUrl: registeredJob?.jobLink && registeredJob?.jobLink
+                    jobTitle: updatedJob.jobTitle,
+                    jobCategory: updatedJob.jobDescription,
+                    jobId: updatedJob?._id,
+                    jobUrl: updatedJob?.jobLink && updatedJob?.jobLink
                 };
-                // console.log(user.sessions);
                 const currentSession = user.sessions[user.sessions.length - 1];
                 if (currentSession) {
                     const currentSubSession = currentSession[currentSession.length - 1];
@@ -44,8 +41,7 @@ const registerJob = async (req, res) => {
                     await findAndUpdateUser({
                         email: user.email,
                         requestBody: {
-                            sessions: user.sessions,
-                            isRecruiterEnabled: true
+                            sessions: user.sessions
                             // accessToken: newUserAccessToken
                         }
                     });
@@ -56,9 +52,9 @@ const registerJob = async (req, res) => {
                         maxAge: 24 * 60 * 60 * 1000 // 1 day
                     });
                     return res.status(201).json({
-                        responseMessage: 'job registered/created successfully',
+                        responseMessage: 'post/content was un-registered/deleted successfully',
                         response: {
-                            createdJob: registeredJob,
+                            updatedJob,
                             accessToken: newUserAccessToken,
                             sessionStatus
                         }
@@ -66,7 +62,7 @@ const registerJob = async (req, res) => {
                 }
                 return;
             }
-            return;
+            // }
         }
         catch (error) {
             if (error instanceof Error) {
@@ -89,4 +85,4 @@ const registerJob = async (req, res) => {
     // }
     return;
 };
-export default registerJob;
+export default updatePlatformJob;

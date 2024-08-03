@@ -99,10 +99,22 @@ export const userSchema = z.object({
         invalid_type_error: 'isAdmin must be a boolean type'
     })
         .optional(),
+    signedUpWithWallet: z
+        .boolean({
+        // required_error: ' signedUpWithWallet is required',
+        invalid_type_error: ' signedUpWithWallet must be a boolean type'
+    })
+        .optional(),
     isCommunityMember: z
         .boolean({
         // required_error: 'isCommunityMember is required',
         invalid_type_error: 'isCommunityMember must be a boolean type'
+    })
+        .optional(),
+    isNewsletterSubscriber: z
+        .boolean({
+        // required_error: 'isCommunityMember is required',
+        invalid_type_error: ' isNewsletterSubscriber must be a boolean type'
     })
         .optional(),
     savedJobs: z.array(jobSchema).optional(),

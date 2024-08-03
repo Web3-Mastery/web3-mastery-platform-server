@@ -70,6 +70,18 @@ export const jobSchema = z.object({
         }),
         posterId: objectIdSchema.optional()
     }),
+    bookmarks: z.object({
+        bookmarkedUsers: z.array(z.object({
+            userId: z.string({
+                required_error: 'bookmarkedUserId is required',
+                invalid_type_error: 'bookmarkedUserId must be a string'
+            })
+        })),
+        bookmarksCount: z.string({
+            required_error: 'bookmarksCount is required',
+            invalid_type_error: 'bookmarksCount must be a string'
+        })
+    }),
     jobLink: z
         .string({
         // required_error: 'jobLink is required',

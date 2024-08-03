@@ -34,15 +34,16 @@ const deletePlatformJob = async (req, res) => {
                 };
                 const currentSession = user.sessions[user.sessions.length - 1];
                 if (currentSession) {
-                    // const currentSubSession = currentSession[currentSession.length - 1];
+                    const currentSubSession = currentSession[currentSession.length - 1];
                     // const currentSessionId = currentSubSession?.sessionId;
                     // const currentTimeInMilliseconds = Date.now();
                     const newCurrentSubSessionObject = {
-                        // checkInTime: currentTimeInMilliseconds.toString(),
+                        ...currentSubSession,
+                        //   checkInTime: currentTimeInMilliseconds.toString(),
                         subSessionActivity: currentUserSubSessionActivity
                         // sessionId: currentSessionId // same id since they are on the same session
                     };
-                    currentSession?.push(newCurrentSubSessionObject);
+                    currentSession[currentSession?.length - 1] = newCurrentSubSessionObject;
                     await findAndUpdateUser({
                         email: user.email,
                         requestBody: {

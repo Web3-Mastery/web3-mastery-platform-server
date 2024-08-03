@@ -2,19 +2,14 @@ import { findPost } from '../lib/post.findPost.service.js';
 import { findUser } from '../../user/lib/user.findUser.service.js';
 import { findSessionActivity } from '../../platform/lib/sessionActivityManagement/platform.findSessionActivity.service.js';
 import { findAndUpdateUser } from '../../user/lib/user.findAndUpdateUser.service.js';
-const getPost = async (req, res) => {
+import { findAndUpdatePost } from '../lib/post.findAndUpdatePost.service.js';
+const reactToPost = async (req, res) => {
     if (req.user) {
         try {
             const { postId } = req.params;
             const { subSessionActivityId: activityId, sessionStatus, userEmail, userId, newUserAccessToken, newUserRefreshToken } = req.user;
             const foundPost = await findPost({ postId });
             const user = await findUser({ email: userEmail });
-            // if (!user) {
-            //   return res.status(403).json({
-            //     error: 'request rejected',
-            //     responseMessage: `user with id: '${userId}' not found or does not exist`
-            //   });
-            // }
             if (!foundPost) {
                 return res.status(400).json({
                     error: 'item not found',
@@ -23,13 +18,30 @@ const getPost = async (req, res) => {
             }
             // get current user activity
             const currentUserSubSessionActivity = await findSessionActivity({ activityId });
-            const reactedUsers = foundPost.reactions.reactedUsers;
-            const bookmarkedUsers = foundPost.bookmarks.bookmarkedUsers;
-            if (currentUserSubSessionActivity && newUserAccessToken && userId && newUserRefreshToken) {
-                // check if user has liked this post
-                const hasUserReacted = reactedUsers?.find((each) => {
-                    return (each.userId = userId);
+            if (foundPost && user && currentUserSubSessionActivity && newUserAccessToken && userId && newUserRefreshToken) {
+                // increase postReactionCount
+                const currentPostReactionCount = foundPost.reactions.reactionsCount;
+                const newCurrentPostReactionCount = Number(currentPostReactionCount) - 1;
+                // remove user from post reaction list
+                const index = foundPost.reactions.reactedUsers?.indexOf({ userId: userId });
+                // check if the user exists in the array
+                if (index && index !== -1) {
+                    // Remove the user using splice
+                    foundPost.reactions.reactedUsers.splice(index, 1);
+                }
+                // add reacting user to postReactionUsers list => removal instead - done already
+                // const newReactedUsersArray = [...foundPost.reactions.reactedUsers, { userId: user._id }];
+                const updatedPostData = await findAndUpdatePost({
+                    postId: postId,
+                    postData: {
+                        ...foundPost,
+                        reactions: {
+                            reactionsCount: newCurrentPostReactionCount.toString(),
+                            reactedUsers: foundPost.reactions.reactedUsers
+                        }
+                    }
                 });
+                const bookmarkedUsers = foundPost.bookmarks.bookmarkedUsers;
                 // check if user has bookmarked this post
                 const hasUserBookmarked = bookmarkedUsers?.find((each) => {
                     return (each.userId = userId);
@@ -61,24 +73,33 @@ const getPost = async (req, res) => {
                                 // accessToken: newUserAccessToken
                             }
                         });
-                        res.cookie('Web3Mastery_SecretRefreshToken', newUserRefreshToken, {
-                            httpOnly: true,
-                            secure: true,
-                            sameSite: 'none', // Prevent CSRF attacks
-                            maxAge: 24 * 60 * 60 * 1000 // 1 day
-                        });
-                        return res.status(200).json({
-                            responseMessage: `user profile fetched successfully`,
-                            response: {
-                                fetchedPost: foundPost,
-                                accessToken: newUserAccessToken,
-                                extraData: {
-                                    userHasReacted: hasUserReacted ? true : false,
-                                    userHasBookmarked: hasUserBookmarked ? true : false
-                                },
-                                sessionStatus: sessionStatus
-                            }
-                        });
+                        if (updatedPostData) {
+                            // needless since we just removed the user
+                            // const reactedUsers = updatedPostData.reactions.reactedUsers;
+                            // // check if user has liked this post
+                            // const hasUserReacted = reactedUsers?.find((each) => {
+                            //   return (each.userId = userId);
+                            // });
+                            res.cookie('Web3Mastery_SecretRefreshToken', newUserRefreshToken, {
+                                httpOnly: true,
+                                secure: true,
+                                sameSite: 'none', // Prevent CSRF attacks
+                                maxAge: 24 * 60 * 60 * 1000 // 1 day
+                            });
+                            return res.status(200).json({
+                                responseMessage: `user profile fetched successfully`,
+                                response: {
+                                    UN_reactedPost: updatedPostData,
+                                    accessToken: newUserAccessToken,
+                                    extraData: {
+                                        // userHasReacted: hasUserReacted ? true : false,
+                                        userHasReacted: false,
+                                        userHasBookmarked: hasUserBookmarked ? true : false
+                                    },
+                                    sessionStatus: sessionStatus
+                                }
+                            });
+                        }
                     }
                     return;
                 }
@@ -103,4 +124,4 @@ const getPost = async (req, res) => {
     }
     return;
 };
-export default getPost;
+export default reactToPost;

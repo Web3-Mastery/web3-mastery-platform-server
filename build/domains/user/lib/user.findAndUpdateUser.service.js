@@ -1,7 +1,7 @@
 import userModel from '../models/user.model.js';
 export async function findAndUpdateUser(data) {
     try {
-        const { email, id, requestBody } = data;
+        const { email, id, requestBody, walletAddress } = data;
         if (email) {
             const user = await userModel.findOneAndUpdate({
                 email
@@ -14,6 +14,13 @@ export async function findAndUpdateUser(data) {
         }
         if (id) {
             const user = await userModel.findOneAndUpdate({ _id: id }, requestBody, {
+                new: true,
+                runValidators: true
+            });
+            return user;
+        }
+        if (walletAddress) {
+            const user = await userModel.findOneAndUpdate({ walletAddress }, requestBody, {
                 new: true,
                 runValidators: true
             });

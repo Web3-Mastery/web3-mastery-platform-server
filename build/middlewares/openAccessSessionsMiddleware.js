@@ -5,6 +5,8 @@ import { findPreSignUpUser } from '../domains/user/lib/user.findPreSignUpUser.se
 import { findAndUpdatePreSignUpUser } from '../domains/user/lib/user.findAndUpdatePreSignUpUser.service.js';
 import { findUser } from '../domains/user/lib/user.findUser.service.js';
 import { findAndUpdateUser } from '../domains/user/lib/user.findAndUpdateUser.service.js';
+import { updateNewsletterSubscriber } from '../domains/newsletter/lib/newsletter.updateSubscriber.service.js';
+import { findNewsletterSubscriber } from '../domains/newsletter/lib/newsletter.findSubscriber.service.js';
 /* A middleware that does not check for the refresh token. Basically it is used on the 'login' and 'start-signup' end-points
 One of it's core purpose is to create/start sessions */
 // @ts-ignore
@@ -23,6 +25,8 @@ const openAccessSessionsMiddleware = async (req, res, next) => {
         // console.log(preSignUpUser);
         const user = await findUser({ email });
         // console.log(user);
+        const newsletterSubscriber = await findNewsletterSubscriber({ email });
+        // console.log(newsLetterSubscriber);
         if (!sub_session_activity_id || !email) {
             return res.status(401).json({
                 error: 'access forbidden',
@@ -85,7 +89,34 @@ const openAccessSessionsMiddleware = async (req, res, next) => {
                 }
             }
         }
+        if (newsletterSubscriber && newsletterSubscriber.isVerified == true) {
+            if (newsletterSubscriber.sessions && newsletterSubscriber.sessions.length > 0) {
+                // console.log(newsletterSubscriber.sessions);
+                const currentSession = newsletterSubscriber.sessions[newsletterSubscriber.sessions.length - 1];
+                if (currentSession) {
+                    const currentSubSession = currentSession[currentSession.length - 1];
+                    const currentSessionId = currentSubSession?.sessionId;
+                    const newSessionId = Number(currentSessionId) + 1;
+                    const currentTimeInMilliseconds = Date.now();
+                    // console.log(sub_session_activity);
+                    const newCurrentSubSessionObject = {
+                        checkInTime: currentTimeInMilliseconds.toString(),
+                        subSessionActivity: currentSubSessionActivity,
+                        sessionId: newSessionId.toString() // same id since they are on the same session
+                    };
+                    newsletterSubscriber.sessions?.push([newCurrentSubSessionObject]);
+                    await updateNewsletterSubscriber({
+                        email: newsletterSubscriber.email,
+                        requestBody: {
+                            ...newsletterSubscriber,
+                            sessions: newsletterSubscriber.sessions
+                        }
+                    });
+                }
+            }
+        }
         req.user = {
+            userEmail: email,
             subSessionActivityId: sub_session_activity_id
         };
         // proceed to next middleware or route

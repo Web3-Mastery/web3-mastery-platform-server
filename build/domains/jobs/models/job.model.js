@@ -76,6 +76,24 @@ const jobSchema = new mongoose.Schema({
             trim: true
         }
     },
+    bookmarks: {
+        bookmarkedUsers: [
+            {
+                userId: {
+                    type: mongoose.Types.ObjectId,
+                    ref: 'user',
+                    unique: true,
+                    required: [true, 'bookmarkUserId is required'],
+                    trim: true
+                }
+            }
+        ],
+        bookmarksCount: {
+            type: String,
+            required: [true, 'bookmarksCount is required'],
+            trim: true
+        }
+    },
     jobLink: {
         type: String,
         required: [true, 'jobLink required'],

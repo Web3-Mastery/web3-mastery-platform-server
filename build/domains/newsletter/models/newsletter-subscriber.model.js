@@ -8,6 +8,16 @@ const newsletterSubscriberSchema = new mongoose.Schema({
             'Please provide a valid email address'
         ],
         unique: true
+    },
+    isPlatformUser: {
+        type: Boolean
+        // required: [true, 'isAdmin is required']
+    },
+    platformUserId: {
+        type: mongoose.Types.ObjectId,
+        ref: 'user',
+        // required: [true, 'platformUserId is required'],
+        trim: true
     }
 }, {
     timestamps: true

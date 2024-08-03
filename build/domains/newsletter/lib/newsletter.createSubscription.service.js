@@ -1,10 +1,9 @@
 import newsletterSubscriberModel from '../models/newsletter-subscriber.model.js';
 import log from '../../../utils/logger.js';
-export async function createNewsletterSubscription(subscriberEmail) {
+export async function createNewsletterSubscription(data) {
     try {
-        const newSubscriber = await newsletterSubscriberModel.create({
-            email: subscriberEmail
-        });
+        const { subscriber } = data;
+        const newSubscriber = await newsletterSubscriberModel.create(subscriber);
         console.log(newSubscriber);
         return newSubscriber;
     }
