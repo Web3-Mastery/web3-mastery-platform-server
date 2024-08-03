@@ -1,11 +1,11 @@
 import newsletterSubscriberModel from '../models/newsletter-subscriber.model.js';
 import log from '../../../utils/logger.js';
+import type { NewsletterSubscriberSpecs } from '../schemas/newsletter-subscriber.zod.js';
 
-export async function createNewsletterSubscription(subscriberEmail: string) {
+export async function createNewsletterSubscription(data: { subscriber: NewsletterSubscriberSpecs }) {
   try {
-    const newSubscriber = await newsletterSubscriberModel.create({
-      email: subscriberEmail
-    });
+    const { subscriber } = data;
+    const newSubscriber = await newsletterSubscriberModel.create(subscriber);
 
     console.log(newSubscriber);
 

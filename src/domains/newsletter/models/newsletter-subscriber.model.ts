@@ -1,7 +1,12 @@
 import mongoose from 'mongoose';
 import type { NewsletterSubscriberSpecs } from '../schemas/newsletter-subscriber.zod.js';
 
-const newsletterSubscriberSchema = new mongoose.Schema<NewsletterSubscriberSpecs>(
+interface _NewsletterSubscriberSpecs extends NewsletterSubscriberSpecs {
+  createdAt: Date;
+  updatedAt: Date;
+}
+
+const newsletterSubscriberSchema = new mongoose.Schema<_NewsletterSubscriberSpecs>(
   {
     email: {
       type: String,
@@ -11,6 +16,16 @@ const newsletterSubscriberSchema = new mongoose.Schema<NewsletterSubscriberSpecs
         'Please provide a valid email address'
       ],
       unique: true
+    },
+    isPlatformUser: {
+      type: Boolean
+      // required: [true, 'isAdmin is required']
+    },
+    platformUserId: {
+      type: mongoose.Types.ObjectId,
+      ref: 'user',
+      // required: [true, 'platformUserId is required'],
+      trim: true
     }
   },
   {
